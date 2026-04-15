@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Uso — Simulador Previdenciário COGERH</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f2744;
+  --navy-mid: #1a3a5c;
+  --teal: #0d7377;
+  --teal-light: #14a085;
+  --gold: #d4a853;
+  --gold-light: #f0c06a;
+  --red: #c0392b;
+  --green: #1a7a4a;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --border: #dce4ef;
+  --text: #1a2940;
+  --muted: #6b7fa3;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: #ffffff;
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+.header-logo { display: flex; align-items: center; gap: 12px; }
+.logo-badge {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: white;
+}
+.logo-text .main { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.5px; color: var(--navy); }
+.logo-text .sub  { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.header-logo-right img { height: 48px; object-fit: contain; }
+
+/* LAYOUT */
+.container { max-width: 860px; margin: 0 auto; padding: 32px 16px; }
+
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  border-radius: 16px;
+  padding: 36px 40px;
+  color: white;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute; right: -40px; top: -40px;
+  width: 220px; height: 220px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+.hero h1 { font-family: var(--font-display); font-size: 28px; margin-bottom: 8px; }
+.hero p  { font-size: 14px; color: rgba(255,255,255,0.65); max-width: 520px; line-height: 1.6; }
+.hero-version {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* TOC */
+.toc-card {
+  background: var(--card);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 24px 28px;
+  margin-bottom: 28px;
+}
+.toc-title { font-size: 13px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+.toc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
+.toc-list li a {
+  font-size: 13px; color: var(--teal); text-decoration: none; font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+}
+.toc-list li a:hover { text-decoration: underline; }
+
+/* SECTION */
+.section { margin-bottom: 28px; }
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px 12px 0 0;
+}
+.section-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.section-header h2 { font-family: var(--font-display); font-size: 18px; }
+.section-header p  { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.section-body {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 24px;
+}
+
+/* STEP BLOCK */
+.step-block {
+  border-left: 3px solid var(--teal);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  background: rgba(13,115,119,0.04);
+  border-radius: 0 8px 8px 0;
+}
+.step-block h3 { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.step-block p  { font-size: 13px; color: var(--text); line-height: 1.6; }
+.step-block ul { margin: 8px 0 0 16px; }
+.step-block ul li { font-size: 13px; color: var(--text); line-height: 1.8; }
+
+/* FIELD TABLE */
+.field-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+.field-table th { text-align: left; padding: 8px 10px; background: var(--bg); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 2px solid var(--border); }
+.field-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+.field-table tr:last-child td { border-bottom: none; }
+.field-table td:first-child { font-weight: 600; white-space: nowrap; color: var(--navy); }
+.field-table .req { color: var(--gold); font-size: 10px; margin-left: 4px; }
+
+/* SCENARIO BADGES */
+.badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.badge-bear { background: #fee2e2; color: #b91c1c; }
+.badge-base { background: #dbeafe; color: #1d4ed8; }
+.badge-bull { background: #d1fae5; color: #065f46; }
+
+/* TIPO CARDS */
+.tipo-grid { display: grid; gap: 10px; margin-top: 12px; }
+.tipo-item {
+  display: flex; gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+}
+.tipo-num-badge {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--teal); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
+}
+.tipo-item h4 { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.tipo-item p  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* INFO / WARN BOXES */
+.info-box {
+  padding: 12px 14px;
+  background: rgba(13,115,119,0.06);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px; color: var(--muted); line-height: 1.5;
+  margin: 12px 0;
+}
+.info-box strong { color: var(--teal); }
+.warn-box {
+  padding: 12px 14px;
+  background: rgba(212,168,83,0.1);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px; color: #7a5a10; line-height: 1.5;
+  margin: 12px 0;
+}
+.success-box {
+  padding: 12px 14px;
+  background: rgba(26,122,74,0.07);
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px; color: var(--green); line-height: 1.5;
+  margin: 12px 0;
+}
+
+/* GLOSSARY */
+.gloss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.gloss-item { padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; }
+.gloss-item dt { font-size: 12px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+.gloss-item dd { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* FORMULA BOX */
+.formula {
+  font-family: 'Courier New', monospace;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--navy);
+  margin: 10px 0;
+  line-height: 1.8;
+}
+
+/* ACTION BUTTON */
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  color: white; border: none; border-radius: 8px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 2px 8px rgba(13,115,119,0.3);
+  margin-bottom: 28px;
+}
+.btn-back:hover { opacity: 0.9; }
+
+/* DIVIDER */
+hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* FOOTER */
+.footer { text-align: center; font-size: 11px; color: var(--muted); padding: 24px 0 8px; }
+
+@media (max-width: 600px) {
+  .toc-list { grid-template-columns: 1fr; }
+  .gloss-grid { grid-template-columns: 1fr; }
+  .hero { padding: 24px 20px; }
+  .section-body { padding: 16px; }
+}
+
+@media print {
+  body { background: white; }
+  .header { box-shadow: none; border-bottom: 1px solid var(--border); }
+  .btn-back { display: none; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-badge">CE</div>
+    <div class="logo-text">
+      <div class="main">Simulador Previdenciário - COGERH</div>
+      <div class="sub">RPPS · RPC · CE-Prevcom, by@Sosthenis</div>
+    </div>
+  </div>
+  <div class="header-logo-right">
+    <img src="logo-cogerh.png" alt="COGERH">
+  </div>
+</div>
+
+<div class="container">
+
+  <a href="index.html" class="btn-back">← Voltar ao Simulador</a>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Manual de Uso</h1>
+    <p>Guia completo para utilização do Simulador Previdenciário da COGERH — entenda cada etapa, campos, cenários e como interpretar os resultados da sua simulação.</p>
+    <span class="hero-version">Versão 2026.01-1 · CE-Prevcom</span>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc-card">
+    <div class="toc-title">Índice</div>
+    <ul class="toc-list">
+      <li><a href="#sec1">1. O que é este simulador</a></li>
+      <li><a href="#sec2">2. Etapa 1 — Identificação</a></li>
+      <li><a href="#sec3">3. Etapa 2 — Dados Financeiros</a></li>
+      <li><a href="#sec4">4. Etapa 3 — Parâmetros do RPC</a></li>
+      <li><a href="#sec5">5. Etapa 4 — Resultados</a></li>
+      <li><a href="#sec6">6. Cenários de Simulação</a></li>
+      <li><a href="#sec7">7. Gerar PDF da Simulação</a></li>
+      <li><a href="#sec8">8. Tipos de Simulação</a></li>
+      <li><a href="#sec9">9. Glossário</a></li>
+      <li><a href="#sec10">10. Memória de Cálculo</a></li>
+    </ul>
+  </div>
+
+  <!-- SEÇÃO 1 -->
+  <div class="section" id="sec1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <h2>O que é este simulador</h2>
+        <p>Visão geral e finalidade</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:14px;line-height:1.7;margin-bottom:14px;">
+        O <strong>Simulador Previdenciário COGERH</strong> é uma ferramenta que permite ao servidor(a) da COGERH projetar e comparar a renda de aposentadoria em dois cenários:
+      </p>
+      <div class="step-block">
+        <h3>🔴 Sem RPC — RPPS puro</h3>
+        <p>O servidor mantém apenas o Regime Próprio de Previdência Social (RPPS), sem contribuir para o Regime de Previdência Complementar (RPC) da CE-PREVCOM.</p>
+      </div>
+      <div class="step-block">
+        <h3>🟢 Com RPC — RPPS limitado + CE-Prevcom</h3>
+        <p>O RPPS fica limitado ao teto do RGPS/INSS (R$&nbsp;8.475,55). O diferencial salarial é coberto pelo RPC da CE-PREVCOM. Para migração de regime, o Benefício Especial (BE) também entra no cálculo.</p>
+      </div>
+      <div class="info-box">
+        <strong>Importante:</strong> Esta é uma simulação <strong>ilustrativa</strong>. Os valores projetados dependem de premissas (crescimento salarial, taxa de rentabilidade, alíquota de IR) e não substituem assessoria previdenciária profissional. Consulte a CE-PREVCOM antes de tomar qualquer decisão.
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 2 -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <h2>Etapa 1 — Identificação</h2>
+        <p>Perfil pessoal e funcional</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Preencha seus dados pessoais e funcionais. Esses dados determinam a idade mínima de aposentadoria e o tipo de projeção.</p>
+
+      <table class="field-table">
+        <thead>
+          <tr>
+            <th>Campo</th>
+            <th>O que preencher</th>
+            <th>Obs.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Idade Atual <span class="req">★</span></td>
+            <td>Sua idade em anos inteiros (18 a 74)</td>
+            <td>Obrigatório</td>
+          </tr>
+          <tr>
+            <td>Tempo de Contribuição RPPS <span class="req">★</span></td>
+            <td>Anos já contribuídos, incluindo averbações de outros vínculos</td>
+            <td>Obrigatório</td>
+          </tr>
+          <tr>
+            <td>Sexo</td>
+            <td>Masculino ou Feminino — afeta a idade mínima de aposentadoria</td>
+            <td>–</td>
+          </tr>
+          <tr>
+            <td>Categoria Funcional</td>
+            <td>Servidor(a) Geral / Professor(a) / Segurança Pública</td>
+            <td>Define aposentadoria especial</td>
+          </tr>
+          <tr>
+            <td>Tipo de Simulação <span class="req">★</span></td>
+            <td>Ver Seção 8 deste manual para detalhes de cada tipo</td>
+            <td>Obrigatório</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <div class="step-block">
+        <h3>📐 Idade mínima legal para aposentadoria</h3>
+        <p>O simulador calcula automaticamente com base na categoria e sexo:</p>
+        <ul>
+          <li><strong>Servidor(a) Geral — Masculino:</strong> 65 anos</li>
+          <li><strong>Servidor(a) Geral — Feminino:</strong> 62 anos</li>
+          <li><strong>Professor(a) — Masculino:</strong> 60 anos</li>
+          <li><strong>Professor(a) — Feminino:</strong> 57 anos</li>
+          <li><strong>Segurança Pública:</strong> 55 anos (ambos)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 3 -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <h2>Etapa 2 — Dados Financeiros</h2>
+        <p>Remuneração atual e estimativa de benefício previdenciário</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <table class="field-table">
+        <thead>
+          <tr>
+            <th>Campo</th>
+            <th>O que preencher</th>
+            <th>Dica</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Remuneração atual <span class="req">★</span></td>
+            <td>Soma de todas as rubricas do contracheque que têm incidência previdenciária (base RPPS)</td>
+            <td>Consulte o RH ou o Siape</td>
+          </tr>
+          <tr>
+            <td>Benefício RPPS estimado <span class="req">★</span></td>
+            <td><strong>Tipo 1:</strong> Projeção sem limitação (última remuneração, ou ~65-75% da média para ingresso após 2004)<br><strong>Tipos 2 e 3:</strong> Máximo = R$&nbsp;8.475,55 (teto RGPS)</td>
+            <td>Obter no RH / CEARAPREV</td>
+          </tr>
+          <tr>
+            <td>Benefício Especial (BE)</td>
+            <td><em>Apenas para Tipo 1 (Migração).</em> Valor pago pelo Tesouro Estadual que complementa a diferença entre o RPPS pleno e o RPPS limitado.</td>
+            <td>Obter no RH / CEARAPREV</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="warn-box">
+        ⚠ O campo <strong>Remuneração atual</strong> deve refletir a <em>base de contribuição previdenciária</em>, não necessariamente o salário bruto total. Abonos e gratificações não permanentes podem não incidir. Confirme com o RH.
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 4 -->
+  <div class="section" id="sec4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <h2>Etapa 3 — Parâmetros do RPC</h2>
+        <p>Configure sua contribuição e preferências de benefício</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <table class="field-table">
+        <thead>
+          <tr>
+            <th>Campo</th>
+            <th>O que preencher</th>
+            <th>Detalhe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Alíquota de contribuição (sua parte)</td>
+            <td>Entre 6,0% e 8,5% — controlado pelo slider</td>
+            <td>A alíquota incide sobre a parcela do salário <strong>acima do teto do RGPS</strong>. O patrocinador (COGERH) contribui com mais 8,5%, totalizando 17% no máximo</td>
+          </tr>
+          <tr>
+            <td>Idade planejada para aposentadoria</td>
+            <td>Idade em que pretende se aposentar. Mínimo = idade legal da sua categoria</td>
+            <td>Quanto mais tarde, maior o saldo acumulado</td>
+          </tr>
+          <tr>
+            <td>Prazo de recebimento do RPC (anos)</td>
+            <td>Por quantos anos deseja receber o benefício complementar. Entre 5 e 30 anos</td>
+            <td>Prazo menor = parcela maior por mês; prazo maior = parcela menor, mas por mais tempo</td>
+          </tr>
+          <tr>
+            <td>Regime tributário do IR no RPC</td>
+            <td><strong>Regressivo</strong> (recomendado para contribuições com mais de 10 anos) ou <strong>Progressivo</strong></td>
+            <td>Regressivo: após 10 anos, a alíquota cai para 10% sobre o benefício RPC</td>
+          </tr>
+          <tr>
+            <td>Saldo já acumulado na CE-PREVCOM</td>
+            <td>Saldo existente na conta individual, se já for participante</td>
+            <td>Deixar em R$&nbsp;0,00 se não for participante ainda</td>
+          </tr>
+          <tr>
+            <td>Portabilidade (de outro fundo)</td>
+            <td>Valor a ser transferido de outro fundo de pensão ou PGBL/VGBL</td>
+            <td>Opcional — deixar em R$&nbsp;0,00 se não houver</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="info-box">
+        <strong>Caixa de pré-visualização:</strong> ao preencher os campos, o simulador exibe automaticamente o número de anos até a aposentadoria e a contribuição mensal estimada ao RPC com base nos dados informados.
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 5 -->
+  <div class="section" id="sec5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div>
+        <h2>Etapa 4 — Resultados</h2>
+        <p>Como ler e interpretar a projeção</p>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="step-block">
+        <h3>🎯 Banner de Variação</h3>
+        <p>O primeiro elemento exibe o <strong>ganho ou perda de renda líquida mensal</strong> na aposentadoria ao aderir ao RPC, comparado ao RPPS puro. Valores positivos (verde) indicam ganho; negativos (vermelho) indicam redução.</p>
+      </div>
+
+      <div class="step-block">
+        <h3>📊 Grade de Comparação</h3>
+        <p>Dois cartões lado a lado mostram o detalhamento das deduções e a renda líquida final em cada cenário:</p>
+        <ul>
+          <li><strong>Sem RPC (RPPS puro):</strong> Benefício RPPS bruto − Contribuição de inativo RPPS − IR Progressivo = Renda Líquida</li>
+          <li><strong>Com RPC (RPPS + CE-Prevcom):</strong> RPPS limitado + BE + Benefício RPC bruto − Contribuições − IR = Renda Líquida</li>
+        </ul>
+      </div>
+
+      <div class="step-block">
+        <h3>📈 Gráfico de Barras — Comparativo por Cenário</h3>
+        <p>Mostra a renda líquida em cada um dos três cenários de rentabilidade (Pessimista 3%, Base 4%, Otimista 5% a.a. real), tanto para Sem RPC quanto Com RPC.</p>
+      </div>
+
+      <div class="step-block">
+        <h3>💰 Saldo Acumulado na CE-PREVCOM</h3>
+        <p>Total projetado acumulado nos três cenários na data da aposentadoria, já considerando contribuições do participante, do patrocinador, saldo inicial e portabilidade.</p>
+      </div>
+
+      <div class="step-block">
+        <h3>💳 Efeito no Contracheque (Tipo 1 — Migração)</h3>
+        <p>Exclusivo para migração de regime. Mostra se haverá aumento ou redução no líquido recebido <strong>hoje</strong> após a migração, considerando que a alíquota RPPS passa a incidir apenas sobre o salário até o teto do RGPS.</p>
+      </div>
+
+      <div class="step-block">
+        <h3>⚕ Benefícios de Risco</h3>
+        <p>Estimativa de <strong>Pensão por Morte</strong> e <strong>Invalidez</strong>, com e sem o RPC, calculada com base no saldo acumulado projetado.</p>
+      </div>
+
+      <div class="warn-box">
+        ⚠ Os valores de risco são <strong>estimativas simplificadas</strong>. O regulamento da CE-PREVCOM pode prever coberturas adicionais via PAR (Plano de Assistência a Risco). Consulte a CE-PREVCOM para obter os valores exatos.
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 6 -->
+  <div class="section" id="sec6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div>
+        <h2>Cenários de Simulação</h2>
+        <p>Pessimista, Base e Otimista</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">O simulador projeta três cenários de rentabilidade real (acima da inflação) para a carteira do RPC:</p>
+
+      <div class="badges">
+        <span class="badge badge-bear">🔴 Pessimista — 3% a.a. real</span>
+        <span class="badge badge-base">🔵 Base — 4% a.a. real</span>
+        <span class="badge badge-bull">🟢 Otimista — 5% a.a. real</span>
+      </div>
+
+      <div class="info-box">
+        <strong>Base de referência:</strong> A CE-PREVCOM historicamente tem entregado rentabilidade entre 4% e 5% a.a. real. O cenário <strong>Base (4%)</strong> é considerado a projeção mais conservadora realista. Use o cenário Pessimista para análise de risco.
+      </div>
+
+      <p style="font-size:13px;margin-top:12px;line-height:1.7;">
+        Você pode alternar entre os cenários nos <strong>botões de abas</strong> no topo da tela de resultados. O restante dos números é atualizado em tempo real conforme o cenário selecionado.
+      </p>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 7 -->
+  <div class="section" id="sec7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div>
+        <h2>Gerar PDF da Simulação</h2>
+        <p>Como exportar e guardar sua simulação</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:13px;line-height:1.7;margin-bottom:16px;">Ao final da simulação, na tela de resultados, você encontrará três opções:</p>
+
+      <div class="step-block">
+        <h3>📄 Baixar PDF da Simulação (botão vermelho)</h3>
+        <p>Gera automaticamente um arquivo <code style="font-size:12px;background:var(--bg);padding:2px 6px;border-radius:4px;">simulacao_prevcom_cogerh.pdf</code> com cabeçalho COGERH e data de geração, e faz o download direto no seu computador ou celular. Recomendado para guardar ou compartilhar.</p>
+      </div>
+
+      <div class="step-block">
+        <h3>🖨️ Imprimir</h3>
+        <p>Abre o diálogo de impressão do navegador. Você pode imprimir em papel ou salvar como PDF pelo próprio navegador (selecione "Salvar como PDF" no destino de impressão). Os elementos de navegação são ocultados automaticamente.</p>
+      </div>
+
+      <div class="step-block">
+        <h3>↺ Nova Simulação</h3>
+        <p>Reinicia o formulário do zero para simular outro perfil.</p>
+      </div>
+
+      <div class="success-box">
+        ✓ <strong>Dica:</strong> Realize a simulação nos três cenários antes de gerar o PDF — o PDF captura o cenário que estiver selecionado no momento do download.
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 8 -->
+  <div class="section" id="sec8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div>
+        <h2>Tipos de Simulação</h2>
+        <p>Qual opção escolher para o seu perfil</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="tipo-grid">
+        <div class="tipo-item">
+          <div class="tipo-num-badge">1</div>
+          <div>
+            <h4>Migração de Regime</h4>
+            <p>Para servidores com RPPS sem limitação de teto que desejam migrar voluntariamente para o modelo de RPPS limitado + RPC CE-PREVCOM. Disponível para quem ingressou no serviço público antes de 01/08/2021. O Benefício Especial (BE) pago pelo Tesouro Estadual entra no cálculo.</p>
+          </div>
+        </div>
+        <div class="tipo-item">
+          <div class="tipo-num-badge">2</div>
+          <div>
+            <h4>Novo(a) Servidor(a)</h4>
+            <p>Para quem ingressou após 01/08/2021, quando o RPPS já passou a ser automaticamente limitado ao teto do RGPS (R$&nbsp;8.475,55). Analisa o complemento que o RPC da CE-PREVCOM proporcionará sobre o benefício limitado.</p>
+          </div>
+        </div>
+        <div class="tipo-item">
+          <div class="tipo-num-badge">3</div>
+          <div>
+            <h4>Participante Facultativo</h4>
+            <p>Para servidores que mantêm o RPPS integral (sem limitação) e desejam contribuir voluntariamente ao RPC como camada adicional de poupança previdenciária. O RPPS não é limitado neste cenário.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn-box" style="margin-top:16px;">
+        ⚠ A migração de regime (Tipo 1) é uma decisão <strong>irreversível</strong>. Uma vez realizada, o servidor não pode retornar ao RPPS integral. Avalie com cuidado e consulte a CE-PREVCOM antes de decidir.
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 9 -->
+  <div class="section" id="sec9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div>
+        <h2>Glossário</h2>
+        <p>Termos e siglas utilizados no simulador</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="gloss-grid">
+        <dl class="gloss-item">
+          <dt>RPPS</dt>
+          <dd>Regime Próprio de Previdência Social — regime previdenciário dos servidores públicos efetivos, administrado pelo Estado do Ceará via CEARAPREV.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>RPC</dt>
+          <dd>Regime de Previdência Complementar — regime opcional (ou compulsório para novos servidores) de acumulação de capital gerido pela CE-PREVCOM.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>CE-PREVCOM</dt>
+          <dd>Entidade fechada de previdência complementar do Estado do Ceará, responsável pela administração do RPC dos servidores estaduais.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>RGPS / Teto do INSS</dt>
+          <dd>Regime Geral de Previdência Social. O teto (R$&nbsp;8.475,55 em 2025) limita o benefício RPPS após a reforma de 2021.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>Benefício Especial (BE)</dt>
+          <dd>Valor pago pelo Tesouro Estadual para compensar parcialmente a diferença entre o RPPS pleno e o RPPS limitado ao teto, para quem migrou voluntariamente.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>Renda Líquida</dt>
+          <dd>Valor recebido na aposentadoria após descontar a contribuição de inativo do RPPS e o Imposto de Renda.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>IR Progressivo</dt>
+          <dd>Tabela de IR com alíquotas crescentes (0% a 27,5%) aplicada sobre a base de cálculo mensal.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>IR Regressivo</dt>
+          <dd>Regime tributário em que a alíquota de IR diminui conforme o prazo de acumulação. Após 10 anos, a alíquota cai para 10% sobre o benefício RPC.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>Contribuição de Inativo RPPS</dt>
+          <dd>14% incidente sobre a parcela do benefício RPPS que excede o limite de isenção (R$&nbsp;3.242,00).</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>Portabilidade</dt>
+          <dd>Transferência de saldo acumulado em outro fundo de pensão ou plano PGBL/VGBL para a CE-PREVCOM, sem incidência de IR.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>PAR</dt>
+          <dd>Plano de Assistência a Risco — cobertura adicional de risco (morte e invalidez) oferecida pela CE-PREVCOM além do RPPS.</dd>
+        </dl>
+        <dl class="gloss-item">
+          <dt>Taxa real</dt>
+          <dd>Rentabilidade descontada a inflação (IPCA). Exemplo: 4% a.a. real significa 4% acima da inflação do período.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 10 -->
+  <div class="section" id="sec10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div>
+        <h2>Memória de Cálculo</h2>
+        <p>Premissas e fórmulas utilizadas</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="step-block">
+        <h3>📌 Premissas gerais</h3>
+        <ul>
+          <li>Crescimento salarial real projetado: <strong>1,0% a.a.</strong></li>
+          <li>Teto RGPS/INSS (2025): <strong>R$&nbsp;8.475,55</strong></li>
+          <li>Isenção de contribuição de inativo RPPS: <strong>R$&nbsp;3.242,00</strong></li>
+          <li>Alíquota de contribuição de inativo RPPS: <strong>14%</strong> sobre o excedente</li>
+          <li>Alíquota de contribuição do patrocinador (COGERH) ao RPC: <strong>8,5%</strong></li>
+          <li>Taxa de carregamento do RPC: <strong>0%</strong></li>
+          <li>Taxa pós-aposentadoria (conversão do saldo em renda): <strong>1,0% a.m. real</strong></li>
+          <li>IR Regressivo após 10 anos de acumulação: <strong>10%</strong></li>
+        </ul>
+      </div>
+
+      <div class="step-block">
+        <h3>📐 Acumulação do saldo RPC</h3>
+        <p>Para cada mês <em>t</em> até a aposentadoria, a contribuição sobre o excedente (salário acima do teto) é capitalizada com a taxa de rentabilidade mensal equivalente à taxa real anual do cenário, com reajuste salarial de 1% a.a.:</p>
+        <div class="formula">
+Saldo(t) = Saldo(t-1) × (1 + r_mensal)
+         + (Salário(t) − Teto) × (alíquota_participante + alíquota_patrocinador)
+        </div>
+      </div>
+
+      <div class="step-block">
+        <h3>📐 Conversão do saldo em renda vitalícia por prazo certo</h3>
+        <p>A renda mensal bruta do RPC é calculada pela fórmula de anuidade (PMT) considerando o saldo acumulado e o prazo de recebimento escolhido:</p>
+        <div class="formula">
+PMT = Saldo × r_pós / (1 − (1 + r_pós)^(−n))
+      onde: r_pós = 1% a.m. | n = prazo em meses
+        </div>
+      </div>
+
+      <div class="step-block">
+        <h3>📐 IR Progressivo (tabela 2025)</h3>
+        <div class="formula">
+Até R$ 2.259,20     →  isento
+R$ 2.259,21 – 2.826,65  →  7,5%
+R$ 2.826,66 – 3.751,05  →  15,0%
+R$ 3.751,06 – 4.664,68  →  22,5%
+Acima de R$ 4.664,68    →  27,5%
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>Nota:</strong> os cálculos são realizados inteiramente no navegador (JavaScript). Nenhum dado pessoal é enviado a servidores externos. Sua simulação é privada.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Manual do Simulador Previdenciário COGERH · CE-PREVCOM · Versão 2026.01-1 · Desenvolvido por @Sosthenis<br>
+    Esta documentação é de uso exclusivo dos servidores da COGERH. Não substitui orientação previdenciária profissional.
+  </div>
+
+</div>
+</body>
+</html>
