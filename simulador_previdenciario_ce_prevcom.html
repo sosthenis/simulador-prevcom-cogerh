@@ -1,0 +1,1106 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f2744;
+  --navy-mid: #1a3a5c;
+  --teal: #0d7377;
+  --teal-light: #14a085;
+  --gold: #d4a853;
+  --gold-light: #f0c06a;
+  --red: #c0392b;
+  --green: #1a7a4a;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --border: #dce4ef;
+  --text: #1a2940;
+  --muted: #6b7fa3;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: #ffffff;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+.header-logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-badge {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: white;
+}
+.logo-text { color: var(--navy); }
+.logo-text .main { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.5px; }
+.logo-text .sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.header-logo-right img { height: 48px; object-fit: contain; }
+
+/* PROGRESS BAR */
+.progress-wrap { background: var(--navy-mid); padding: 0 24px; }
+.progress-steps { display: flex; max-width: 680px; margin: 0 auto; }
+.progress-step {
+  flex: 1; padding: 14px 8px 12px;
+  text-align: center; position: relative; cursor: pointer;
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.35);
+  transition: color 0.2s;
+  border-bottom: 3px solid transparent;
+}
+.progress-step.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+.progress-step.done { color: var(--teal-light); border-bottom-color: var(--teal-light); }
+.progress-step .step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  font-size: 11px; font-weight: 700; margin-bottom: 4px;
+}
+.progress-step.active .step-num { background: var(--gold); color: var(--navy); }
+.progress-step.done .step-num { background: var(--teal); color: white; }
+
+/* MAIN CONTAINER */
+.container { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+
+/* CARD */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(15,39,68,0.08);
+  overflow: hidden;
+}
+.card-header {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  padding: 20px 24px;
+  color: white;
+}
+.card-header h2 { font-family: var(--font-display); font-size: 22px; margin-bottom: 4px; }
+.card-header p { font-size: 13px; color: rgba(255,255,255,0.55); }
+.card-body { padding: 24px; }
+
+/* FORM ELEMENTS */
+.form-grid { display: grid; gap: 16px; }
+.form-grid-2 { grid-template-columns: 1fr 1fr; }
+.form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 12px; font-weight: 600;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+}
+.field label .required { color: var(--gold); }
+.field input, .field select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 500;
+  color: var(--text);
+  background: var(--card);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13,115,119,0.12);
+}
+.field input.currency { padding-left: 28px; }
+.field .input-wrap { position: relative; }
+.field .input-wrap .prefix {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 13px; font-weight: 600;
+}
+.field .hint { font-size: 11px; color: var(--muted); }
+
+/* RADIO GROUP */
+.radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.radio-option {
+  flex: 1; min-width: 80px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px; font-weight: 500;
+  transition: all 0.15s;
+  user-select: none;
+}
+.radio-option:hover { border-color: var(--teal); }
+.radio-option.selected {
+  background: var(--teal); color: white;
+  border-color: var(--teal);
+}
+
+/* TIPO SIMUL */
+.tipo-cards { display: grid; gap: 10px; }
+.tipo-card {
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex; align-items: flex-start; gap: 12px;
+  transition: all 0.15s;
+}
+.tipo-card:hover { border-color: var(--teal); }
+.tipo-card.selected { border-color: var(--teal); background: rgba(13,115,119,0.05); }
+.tipo-card .tipo-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--border); font-size: 13px; font-weight: 700;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.tipo-card.selected .tipo-num { background: var(--teal); color: white; }
+.tipo-card .tipo-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.tipo-card .tipo-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* SLIDER */
+.slider-wrap { display: flex; flex-direction: column; gap: 8px; }
+.slider-value-display {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.slider-val { font-size: 24px; font-weight: 700; color: var(--teal); }
+.slider-val span { font-size: 14px; }
+.slider-employer { font-size: 12px; color: var(--muted); }
+input[type=range] {
+  width: 100%; height: 6px; border-radius: 3px;
+  appearance: none; background: var(--border);
+  outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--teal);
+  border: 3px solid white; box-shadow: 0 2px 6px rgba(13,115,119,0.4);
+}
+.slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+
+/* INFO BOX */
+.info-box {
+  padding: 12px 14px;
+  background: rgba(13,115,119,0.06);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+.info-box strong { color: var(--teal); }
+.warn-box {
+  padding: 12px 14px;
+  background: rgba(212,168,83,0.1);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 12px; color: #7a5a10; line-height: 1.5;
+}
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.btn {
+  padding: 11px 24px; border-radius: 8px;
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--teal), var(--teal-light));
+  color: white;
+  box-shadow: 0 2px 8px rgba(13,115,119,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(13,115,119,0.4); }
+.btn-secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+/* RESULTS */
+.scenario-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.stab {
+  flex: 1; padding: 9px; border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; text-align: center; border: 1.5px solid var(--border);
+  transition: all 0.15s;
+}
+.stab.active-bear { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+.stab.active-base { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; }
+.stab.active-bull { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.stab-label { font-size: 10px; font-weight: 400; opacity: 0.75; display: block; }
+.stab-rate { font-size: 15px; font-weight: 700; }
+
+/* RESULT GRID */
+.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.result-card {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.result-card.sem { border-top: 3px solid var(--muted); }
+.result-card.com { border-top: 3px solid var(--teal); }
+.result-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--bg); font-size: 12px; }
+.result-row:last-child { border-bottom: none; }
+.result-row .val { font-weight: 600; }
+.result-row .val.red { color: var(--red); }
+.result-row .val.green { color: var(--green); }
+.result-row .val.gold { color: #b07d1a; }
+.result-total {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0 0; margin-top: 6px;
+  border-top: 2px solid var(--navy);
+}
+.result-total .label { font-size: 12px; font-weight: 700; }
+.result-total .amount { font-size: 18px; font-weight: 700; font-family: var(--font-display); }
+.result-total.com .amount { color: var(--teal); }
+.result-total.sem .amount { color: var(--navy); }
+
+.variacao-banner {
+  padding: 14px 18px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.variacao-banner.positive { background: rgba(26,122,74,0.08); border: 1px solid rgba(26,122,74,0.25); }
+.variacao-banner.negative { background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.25); }
+.variacao-banner .vb-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+.variacao-banner .vb-value { font-size: 20px; font-weight: 700; font-family: var(--font-display); }
+.variacao-banner.positive .vb-value { color: var(--green); }
+.variacao-banner.negative .vb-value { color: var(--red); }
+.variacao-banner .vb-pct { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
+.variacao-banner.positive .vb-pct { background: rgba(26,122,74,0.12); color: var(--green); }
+.variacao-banner.negative .vb-pct { background: rgba(192,57,43,0.12); color: var(--red); }
+
+/* CHART */
+.chart-wrap {
+  padding: 0 0 8px;
+}
+.chart-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* BAR CHART MANUAL */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-row-label { font-size: 11px; font-weight: 600; width: 95px; flex-shrink: 0; color: var(--muted); text-align: right; }
+.bar-track { flex: 1; height: 28px; background: var(--bg); border-radius: 6px; position: relative; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; transition: width 0.6s cubic-bezier(0.22,1,0.36,1); min-width: 30px; }
+.bar-fill span { font-size: 11px; font-weight: 700; color: white; white-space: nowrap; }
+.bar-row-diff { font-size: 11px; font-weight: 700; width: 60px; flex-shrink: 0; }
+
+/* ACUMULADO SECTION */
+.acum-wrap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.acum-card {
+  padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
+  text-align: center;
+}
+.acum-card .ac-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.acum-card .ac-value { font-size: 16px; font-weight: 700; font-family: var(--font-display); }
+.acum-card.bear .ac-value { color: #ef4444; }
+.acum-card.base .ac-value { color: #3b82f6; }
+.acum-card.bull .ac-value { color: #10b981; }
+
+/* RISCO SECTION */
+.risco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.risco-card { padding: 14px; border-radius: 10px; border: 1px solid var(--border); }
+.risco-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.risco-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; }
+.risco-row .rl { color: var(--muted); }
+.risco-row .rv { font-weight: 600; }
+
+/* EFEITO LIQUIDO */
+.efeito-box {
+  padding: 16px; border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+.efeito-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed var(--border); }
+.efeito-row:last-child { border-bottom: none; font-weight: 700; font-size: 14px; }
+.efeito-row .er-label { color: var(--text); }
+.efeito-row .er-val { font-weight: 500; }
+
+/* DIVIDER */
+.section-divider { margin: 20px 0; border: none; border-top: 1px solid var(--border); }
+.section-title { font-size: 13px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.section-title::before { content: ''; display: block; width: 4px; height: 16px; background: var(--teal); border-radius: 2px; }
+
+/* FOOTER NOTE */
+.footer-note { font-size: 11px; color: var(--muted); line-height: 1.5; padding: 12px; background: var(--bg); border-radius: 8px; margin-top: 16px; }
+
+/* RECOMEÇAR */
+.btn-restart { background: transparent; color: var(--muted); border: 1.5px solid var(--border); padding: 8px 16px; border-radius: 8px; font-family: var(--font-body); font-size: 13px; cursor: pointer; font-weight: 600; }
+.btn-restart:hover { border-color: var(--muted); }
+
+/* PDF BUTTON */
+.btn-pdf {
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(192,57,43,0.3);
+  transition: all 0.15s;
+}
+.btn-pdf:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(192,57,43,0.4); }
+.btn-pdf:disabled { opacity: 0.6; cursor: wait; }
+
+@media (max-width: 600px) {
+  .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: 1fr; }
+  .acum-wrap { grid-template-columns: 1fr; }
+  .risco-grid { grid-template-columns: 1fr; }
+  .progress-step .step-label { display: none; }
+}
+
+@media print {
+  body { background: #ffffff; }
+  .header { box-shadow: none; border-bottom: 1px solid var(--border); padding: 12px 24px; }
+  .progress-wrap, .btn-row, .btn-restart, .scenario-tabs, .btn-print, .btn-pdf, .tipo-cards, .pdf-actions { display: none !important; }
+  .card { box-shadow: none; border: 1px solid var(--border); break-inside: avoid; margin-bottom: 16px; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .container { padding: 0; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-badge">CE</div>
+    <div class="logo-text">
+      <div class="main">Simulador Previdenciário - COGERH</div>
+      <div class="sub">RPPS · RPC · CE-Prevcom, by@Sosthenis</div>
+    </div>
+  </div>
+  <div class="header-logo-right">
+    <img src="log-cogerh.png" alt="COGERH">
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+</div>
+
+<div class="container" id="app"></div>
+
+<script>
+// ================================================================
+// FINANCIAL ENGINE
+// ================================================================
+const RGPS = 8475.55;
+const EMPLOYER_RATE = 0.085;
+const RPPS_CONTRIB_BENEFIT = 0.14;
+const RPPS_EXEMPTION = 3242.00;
+const POST_RETIRE_RATE = 0.01;
+const LOADING_FEE = 0.00;
+
+function irProg(base) {
+  const b = Math.max(0, base);
+  if (b <= 2824) return 0;
+  if (b <= 3751.05) return b*0.075 - 211.80;
+  if (b <= 5050.80) return b*0.15 - 493.84;
+  if (b <= 6448.95) return b*0.225 - 873.58;
+  return b*0.275 - 1195.82;
+}
+function irRegr(base, years) {
+  const b = Math.max(0, base);
+  if (years >= 10) return b * 0.10;
+  if (years >= 8) return b * 0.15;
+  if (years >= 6) return b * 0.20;
+  if (years >= 4) return b * 0.25;
+  if (years >= 2) return b * 0.30;
+  return b * 0.35;
+}
+function accumulate(salary, years, empRate, rate, portability, existing) {
+  const mr = Math.pow(1 + rate, 1/12) - 1;
+  const mg = Math.pow(1.01, 1/12) - 1;
+  let saldo = portability + existing;
+  const months = Math.round(years * 12);
+  for (let m = 0; m < months; m++) {
+    const sal = salary * Math.pow(1 + mg, m);
+    const above = Math.max(0, sal - RGPS);
+    saldo = saldo * (1 + mr) + above * (empRate + EMPLOYER_RATE);
+  }
+  return Math.max(0, saldo);
+}
+function rpcBenefit(saldo, years, postRate) {
+  if (!saldo || years <= 0) return 0;
+  const mr = Math.pow(1 + postRate, 1/12) - 1;
+  const n = Math.round(years * 12);
+  if (mr < 1e-8) return saldo / n;
+  return saldo * mr / (1 - Math.pow(1 + mr, -n));
+}
+function fmtBRL(v) {
+  return 'R$\u00a0' + (v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtPct(v) {
+  return (v*100).toFixed(1).replace('.',',') + '%';
+}
+
+// ================================================================
+// STATE
+// ================================================================
+const STEPS = ['Identificação','Financeiro','RPC','Resultados'];
+const SCENARIOS = [
+  {key:'bear', label:'Pessimista', rate:0.03, color:'#ef4444', bg:'#fee2e2', tabCls:'active-bear'},
+  {key:'base', label:'Base',      rate:0.04, color:'#3b82f6', bg:'#dbeafe', tabCls:'active-base'},
+  {key:'bull', label:'Otimista',  rate:0.05, color:'#10b981', bg:'#d1fae5', tabCls:'active-bull'},
+];
+const TIPOS = [
+  {val:'1', title:'Migração de Regime', desc:'Servidor(a) ativo com RPPS irrestrito que deseja limitar o RPPS e ingressar automaticamente no RPC da CE-PREVCOM.'},
+  {val:'2', title:'Novo(a) Servidor(a)', desc:'Ingresso após 01/08/2021 — RPPS já limitado ao teto do RGPS. Analisa cobertura RPPS + RPC.'},
+  {val:'3', title:'Participante Facultativo', desc:'Servidor que mantém RPPS integral e quer contribuir voluntariamente ao RPC.'},
+];
+const CATS = [
+  {val:'1', label:'Servidor(a) Geral'},
+  {val:'2', label:'Professor(a)'},
+  {val:'3', label:'Segurança Pública'},
+];
+function retireAge(cat, sex) {
+  if (cat==='3') return 55;
+  if (cat==='2') return sex==='M'?60:57;
+  return sex==='M'?65:62;
+}
+
+let state = {
+  step: 0,
+  scenario: 'base',
+  // Step 0
+  idade: '', sexo: 'M', cat: '1', tipo: '1', tempoContrib: '',
+  // Step 1
+  salario: '', rppsEstimado: '', beneficioEspecial: '0',
+  // Step 2
+  aliquota: 8.5, prazo: 25, tributo: 'R', portabilidade: '0', saldoAtual: '0', idadeAposentadoria: '',
+};
+
+// ================================================================
+// RENDER ENGINE
+// ================================================================
+function render() {
+  renderProgress();
+  const app = document.getElementById('app');
+  if (state.step === 0) app.innerHTML = renderStep0();
+  else if (state.step === 1) app.innerHTML = renderStep1();
+  else if (state.step === 2) app.innerHTML = renderStep2();
+  else app.innerHTML = renderResults();
+  attachListeners();
+}
+
+function renderProgress() {
+  const el = document.getElementById('progressSteps');
+  el.innerHTML = STEPS.map((s,i) => {
+    const cls = i < state.step ? 'done' : i === state.step ? 'active' : '';
+    return `<div class="progress-step ${cls}" onclick="goStep(${i})">
+      <div class="step-num">${i < state.step ? '✓' : i+1}</div>
+      <div class="step-label">${s}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderStep0() {
+  const ra = retireAge(state.cat, state.sexo);
+  return `<div class="card">
+    <div class="card-header">
+      <h2>Dados de Identificação</h2>
+      <p>Informe seu perfil pessoal e funcional para a simulação</p>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="form-grid form-grid-2">
+          <div class="field">
+            <label>Idade Atual <span class="required">*</span></label>
+            <input type="number" id="f_idade" value="${state.idade}" placeholder="ex: 42" min="18" max="74">
+          </div>
+          <div class="field">
+            <label>Tempo de Contribuição RPPS <span class="required">*</span></label>
+            <input type="number" id="f_tempo" value="${state.tempoContrib}" placeholder="anos (incluir averbações)">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Sexo (para efeito de aposentadoria)</label>
+          <div class="radio-group">
+            <div class="radio-option ${state.sexo==='M'?'selected':''}" onclick="setSexo('M')">Masculino</div>
+            <div class="radio-option ${state.sexo==='F'?'selected':''}" onclick="setSexo('F')">Feminino</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Categoria Funcional</label>
+          <div class="radio-group">
+            ${CATS.map(c=>`<div class="radio-option ${state.cat===c.val?'selected':''}" onclick="setCat('${c.val}')">${c.label}</div>`).join('')}
+          </div>
+          <span class="hint">Idade mínima legal para aposentadoria: <strong>${ra} anos</strong></span>
+        </div>
+
+        <div class="field">
+          <label>Tipo de Simulação <span class="required">*</span></label>
+          <div class="tipo-cards">
+            ${TIPOS.map(t=>`<div class="tipo-card ${state.tipo===t.val?'selected':''}" onclick="setTipo('${t.val}')">
+              <div class="tipo-num">${t.val}</div>
+              <div>
+                <div class="tipo-title">${t.title}</div>
+                <div class="tipo-desc">${t.desc}</div>
+              </div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="nextStep()">Próximo →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderStep1() {
+  const ra = retireAge(state.cat, state.sexo);
+  const isTipo1 = state.tipo === '1';
+  return `<div class="card">
+    <div class="card-header">
+      <h2>Dados Financeiros</h2>
+      <p>Remuneração atual e estimativa de benefício previdenciário</p>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>Remuneração atual (base de contribuição ao RPPS) <span class="required">*</span></label>
+          <div class="input-wrap">
+            <span class="prefix">R$</span>
+            <input type="number" class="currency" id="f_salario" value="${state.salario}" placeholder="0,00" min="0" step="100">
+          </div>
+          <span class="hint">Soma das rubricas com incidência previdenciária</span>
+        </div>
+
+        <div class="field">
+          <label>Estimativa do benefício RPPS ${isTipo1?'SEM limitação (situação atual)':''} <span class="required">*</span></label>
+          <div class="input-wrap">
+            <span class="prefix">R$</span>
+            <input type="number" class="currency" id="f_rpps" value="${state.rppsEstimado}" placeholder="0,00" min="0" step="100">
+          </div>
+          <span class="hint">${isTipo1?'Para ingresso até 2003: última remuneração. Após 2004: média da carreira (~65-75% do último salário). Consulte o RH.':'Valor máximo: '+fmtBRL(RGPS)+' (teto RGPS/INSS)'}</span>
+        </div>
+
+        ${isTipo1 ? `<div class="field">
+          <label>Benefício Especial (BE) estimado</label>
+          <div class="input-wrap">
+            <span class="prefix">R$</span>
+            <input type="number" class="currency" id="f_be" value="${state.beneficioEspecial}" placeholder="0,00" min="0" step="100">
+          </div>
+          <span class="hint">Benefício pago pelo Tesouro Estadual (diferencial entre RPPS pleno e limitado). Obter do RH/CEARAPREV.</span>
+        </div>` : '<div></div>'}
+
+        <div class="info-box">
+          <strong>Teto do RGPS/INSS atual:</strong> ${fmtBRL(RGPS)}<br>
+          ${isTipo1?`Com a migração, seu RPPS ficará <strong>limitado a este teto</strong>. O Benefício Especial compensará a diferença parcialmente.`:`Seu RPPS já está limitado a este teto.`}
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">← Voltar</button>
+        <button class="btn btn-primary" onclick="nextStep()">Próximo →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderStep2() {
+  const ra = retireAge(state.cat, state.sexo);
+  const idadeAtual = parseFloat(state.idade)||0;
+  const idadeAposentadoria = parseFloat(state.idadeAposentadoria)||ra;
+  const anos = Math.max(0, idadeAposentadoria - idadeAtual);
+  const empRate = state.aliquota / 100;
+  const totalRate = (empRate + EMPLOYER_RATE) * 100;
+  
+  return `<div class="card">
+    <div class="card-header">
+      <h2>Parâmetros do RPC</h2>
+      <p>Configure sua contribuição e preferências de benefício</p>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Alíquota de contribuição ao RPC (sua parte)</label>
+          <div class="slider-wrap">
+            <div class="slider-value-display">
+              <div>
+                <div class="slider-val">${state.aliquota.toFixed(1).replace('.',',')}%<span> /mês</span></div>
+                <div class="slider-employer">+ ${(EMPLOYER_RATE*100).toFixed(1).replace('.',',')}% do patrocinador → total ${totalRate.toFixed(1).replace('.',',')}%</div>
+              </div>
+            </div>
+            <input type="range" id="f_aliq" min="6" max="8.5" step="0.5" value="${state.aliquota}">
+            <div class="slider-labels">
+              <span>6,0% (mín.)</span>
+              <span>7,0%</span>
+              <span>7,5%</span>
+              <span>8,0%</span>
+              <span>8,5% (padrão)</span>
+            </div>
+          </div>
+          <span class="hint">Alíquota incide sobre a parcela da remuneração <strong>acima do teto do RGPS</strong> (${fmtBRL(RGPS)})</span>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <div class="field">
+            <label>Idade planejada para aposentadoria</label>
+            <input type="number" id="f_idadeAposen" value="${state.idadeAposentadoria||ra}" min="${ra}" max="75" step="1">
+            <span class="hint">Mínimo legal: ${ra} anos · Compulsória: 75</span>
+          </div>
+          <div class="field">
+            <label>Prazo de recebimento do RPC (anos)</label>
+            <input type="number" id="f_prazo" value="${state.prazo}" min="5" max="30">
+            <span class="hint">Entre 5 e 30 anos (mín./máx. regulamento)</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Regime tributário do IR no RPC</label>
+          <div class="radio-group">
+            <div class="radio-option ${state.tributo==='R'?'selected':''}" onclick="setTributo('R')">Regressivo (recomendado para > 10 anos)</div>
+            <div class="radio-option ${state.tributo==='P'?'selected':''}" onclick="setTributo('P')">Progressivo</div>
+          </div>
+          <span class="hint">Regime Regressivo: após 10 anos de acumulação, IR cai para 10% sobre o benefício RPC</span>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <div class="field">
+            <label>Saldo já acumulado na CE-PREVCOM</label>
+            <div class="input-wrap">
+              <span class="prefix">R$</span>
+              <input type="number" class="currency" id="f_saldo" value="${state.saldoAtual}" placeholder="0,00" min="0">
+            </div>
+          </div>
+          <div class="field">
+            <label>Portabilidade (de outro fundo)</label>
+            <div class="input-wrap">
+              <span class="prefix">R$</span>
+              <input type="number" class="currency" id="f_port" value="${state.portabilidade}" placeholder="0,00" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          Com <strong>${anos.toFixed(1)} anos</strong> até a aposentadoria e remuneração atual de <strong>${fmtBRL(parseFloat(state.salario)||0)}</strong>,
+          a contribuição mensal estimada ao RPC (acima do teto) é de
+          <strong>${fmtBRL(Math.max(0,(parseFloat(state.salario)||0)-RGPS)*(empRate+EMPLOYER_RATE))}</strong>.
+          (Crece conforme reajuste salarial projetado de 1% a.a. real)
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="prevStep()">← Voltar</button>
+        <button class="btn btn-primary" onclick="goResults()">Ver Resultado →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function computeAll() {
+  const salary = parseFloat(state.salario)||0;
+  const rppsNoRPC = parseFloat(state.rppsEstimado)||0;
+  const empRate = state.aliquota / 100;
+  const portability = parseFloat(state.portabilidade)||0;
+  const existing = parseFloat(state.saldoAtual)||0;
+  const prazo = Math.min(30, Math.max(5, parseFloat(state.prazo)||25));
+  const be = parseFloat(state.beneficioEspecial)||0;
+  const regimeTrib = state.tributo;
+  const ra = retireAge(state.cat, state.sexo);
+  const idadeAtual = parseFloat(state.idade)||0;
+  const idadeAposentadoria = parseFloat(state.idadeAposentadoria)||ra;
+  const yearsToRetire = Math.max(0, idadeAposentadoria - idadeAtual);
+  const rppsLimited = Math.min(rppsNoRPC, RGPS);
+
+  return SCENARIOS.map(sc => {
+    const rate = sc.rate;
+    const saldo = accumulate(salary, yearsToRetire, empRate, rate, portability, existing);
+    const rpcGross = rpcBenefit(saldo, prazo, POST_RETIRE_RATE);
+
+    // SEM RPC
+    const rppsC_sem = Math.max(0, rppsNoRPC - RPPS_EXEMPTION) * RPPS_CONTRIB_BENEFIT;
+    const irSem = Math.max(0, irProg(rppsNoRPC - rppsC_sem));
+    const liqSem = rppsNoRPC - rppsC_sem - irSem;
+
+    // COM RPC
+    const rppsC_com = Math.max(0, rppsLimited - RPPS_EXEMPTION) * RPPS_CONTRIB_BENEFIT;
+    const irRPPScom = Math.max(0, irProg(rppsLimited + be - rppsC_com));
+    const rppsLiqCom = rppsLimited + be - rppsC_com - irRPPScom;
+    const irRPC = regimeTrib === 'R'
+      ? Math.max(0, irRegr(rpcGross, yearsToRetire))
+      : Math.max(0, irProg(rpcGross));
+    const rpcLiq = rpcGross - irRPC;
+    const liqCom = rppsLiqCom + rpcLiq;
+    const variacao = liqCom - liqSem;
+    const variacaoPct = liqSem > 0 ? variacao / liqSem : 0;
+
+    // EFEITO NO LIQUIDO ATUAL (salário)
+    const contrib_sem = salary * RPPS_CONTRIB_BENEFIT;
+    const irSal_sem = Math.max(0, irProg(salary - contrib_sem));
+    const liqSal_sem = salary - contrib_sem - irSal_sem;
+    const contrib_rpps_com = Math.min(salary, RGPS) * RPPS_CONTRIB_BENEFIT;
+    const contrib_rpc_com = Math.max(0, salary - RGPS) * empRate;
+    const contrib_total_com = contrib_rpps_com + contrib_rpc_com;
+    const baseIR_com = salary - contrib_rpps_com - contrib_rpc_com;
+    const irSal_com = Math.max(0, irProg(baseIR_com));
+    const liqSal_com = salary - contrib_total_com - irSal_com;
+    const efeitoLiq = liqSal_com - liqSal_sem;
+
+    // PENSÃO POR MORTE (simplificado)
+    const pensaoRPPS = rppsNoRPC;
+    const pensaoRPPS_liq_sem = Math.max(0, pensaoRPPS - RPPS_EXEMPTION) * RPPS_CONTRIB_BENEFIT;
+    const irPensaoSem = Math.max(0, irProg(pensaoRPPS - pensaoRPPS_liq_sem));
+    const pensaoLiqSem = pensaoRPPS - pensaoRPPS_liq_sem - irPensaoSem;
+
+    const pensaoRPPS_com = rppsLimited;
+    const rpcPensao = rpcBenefit(saldo, prazo, POST_RETIRE_RATE);
+    const irPensaoRPC = regimeTrib === 'R' ? Math.max(0, irRegr(rpcPensao, yearsToRetire)) : Math.max(0, irProg(rpcPensao));
+    const pensaoLiqCom = Math.max(0, pensaoRPPS_com - Math.max(0, pensaoRPPS_com - RPPS_EXEMPTION)*RPPS_CONTRIB_BENEFIT - Math.max(0, irProg(pensaoRPPS_com))) + rpcPensao - irPensaoRPC;
+
+    return { ...sc, rate, saldo, rpcGross, rpcLiq, rppsNoRPC, rppsLimited, be,
+      liqSem, liqCom, variacao, variacaoPct,
+      rppsC_sem, irSem, rppsC_com, irRPPScom, irRPC,
+      liqSal_sem, liqSal_com, efeitoLiq,
+      contrib_sem, contrib_rpps_com, contrib_rpc_com, irSal_sem, irSal_com,
+      salary, yearsToRetire, prazo,
+      pensaoLiqSem, pensaoLiqCom,
+    };
+  });
+}
+
+function renderResults() {
+  const data = computeAll();
+  const sc = data.find(d => d.key === state.scenario) || data[1];
+  const isPos = sc.variacao >= 0;
+  const isMig = state.tipo === '1';
+
+  const maxLiq = Math.max(...data.map(d => Math.max(d.liqSem, d.liqCom)), 1);
+  const barScale = v => Math.max(5, (v / maxLiq * 100)).toFixed(1);
+  const barColor = (v, max) => v >= max - 10 ? 'var(--teal)' : 'var(--navy-mid)';
+
+  return `<div id="resultado-pdf" style="display:flex;flex-direction:column;gap:16px;">
+    <!-- SCENARIO TABS -->
+    <div>
+      <div class="scenario-tabs">
+        ${data.map(d => `<div class="stab ${state.scenario===d.key?d.tabCls:''}" onclick="setScenario('${d.key}')">
+          <div class="stab-label">${d.label}</div>
+          <div class="stab-rate">${(d.rate*100).toFixed(0)}% a.a.</div>
+        </div>`).join('')}
+      </div>
+
+      <!-- VARIAÇÃO BANNER -->
+      <div class="variacao-banner ${isPos?'positive':'negative'}">
+        <div>
+          <div class="vb-label">${isPos?'▲ Ganho de renda líquida na aposentadoria':'▼ Redução de renda líquida na aposentadoria'}</div>
+          <div class="vb-value">${fmtBRL(Math.abs(sc.variacao))} / mês</div>
+        </div>
+        <div class="vb-pct">${isPos?'+':'−'}${fmtPct(Math.abs(sc.variacaoPct))}</div>
+      </div>
+
+      <!-- COMPARISON GRID -->
+      <div class="result-grid">
+        <div class="result-card sem">
+          <div class="result-label">🔴 Sem RPC (RPPS puro)</div>
+          <div class="result-row"><span>Benefício RPPS bruto</span><span class="val">${fmtBRL(sc.rppsNoRPC)}</span></div>
+          <div class="result-row"><span>(−) Contrib. inativo RPPS</span><span class="val red">−${fmtBRL(sc.rppsC_sem)}</span></div>
+          <div class="result-row"><span>(−) IR Progressivo</span><span class="val red">−${fmtBRL(sc.irSem)}</span></div>
+          <div class="result-total sem">
+            <span class="label">Renda Líquida</span>
+            <span class="amount">${fmtBRL(sc.liqSem)}</span>
+          </div>
+        </div>
+        <div class="result-card com">
+          <div class="result-label">🟢 Com RPC (RPPS + CE-Prevcom)</div>
+          <div class="result-row"><span>RPPS limitado + BE</span><span class="val">${fmtBRL(sc.rppsLimited + sc.be)}</span></div>
+          <div class="result-row"><span>Benefício RPC bruto</span><span class="val gold">${fmtBRL(sc.rpcGross)}</span></div>
+          <div class="result-row"><span>(−) Contrib. inativo RPPS</span><span class="val red">−${fmtBRL(sc.rppsC_com)}</span></div>
+          <div class="result-row"><span>(−) IR (RPPS + RPC)</span><span class="val red">−${fmtBRL(sc.irRPPScom + sc.irRPC)}</span></div>
+          <div class="result-total com">
+            <span class="label">Renda Líquida</span>
+            <span class="amount">${fmtBRL(sc.liqCom)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BAR CHART -->
+      <div class="card" style="margin-top:0;">
+        <div class="card-body" style="padding:16px;">
+          <div class="chart-title">Comparativo de renda líquida por cenário de taxa</div>
+          <div class="bar-chart">
+            ${data.map(d => {
+              const semW = barScale(d.liqSem);
+              const comW = barScale(d.liqCom);
+              return `
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;">${d.label} (${(d.rate*100).toFixed(0)}% a.a. real)</div>
+                <div class="bar-row">
+                  <div class="bar-row-label">Sem RPC</div>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:${semW}%;background:var(--muted);">
+                      <span>${fmtBRL(d.liqSem)}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-row-label">Com RPC</div>
+                  <div class="bar-track">
+                    <div class="bar-fill" style="width:${comW}%;background:var(--teal);">
+                      <span>${fmtBRL(d.liqCom)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SALDO ACUMULADO -->
+    <div class="card">
+      <div class="card-body" style="padding:16px;">
+        <div class="section-title">Saldo acumulado na CE-PREVCOM na aposentadoria</div>
+        <div class="acum-wrap">
+          ${data.map(d => `<div class="acum-card ${d.key}">
+            <div class="ac-label">${d.label} · ${(d.rate*100).toFixed(0)}%</div>
+            <div class="ac-value">${fmtBRL(d.saldo)}</div>
+          </div>`).join('')}
+        </div>
+        <div class="hint" style="font-size:11px;color:var(--muted);">
+          Acumulação de ${sc.yearsToRetire.toFixed(1)} anos | Prazo de recebimento: ${sc.prazo} anos | Taxa pós-aposentadoria: 1,0% a.a. real
+        </div>
+      </div>
+    </div>
+
+    ${isMig ? `<!-- EFEITO NO CONTRACHEQUE -->
+    <div class="card">
+      <div class="card-body" style="padding:16px;">
+        <div class="section-title">Efeito imediato no líquido da remuneração (mês atual)</div>
+        <div class="efeito-box">
+          <div class="efeito-row">
+            <span class="er-label">Remuneração bruta atual</span>
+            <span class="er-val">${fmtBRL(sc.salary)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">Situação ATUAL — Contribuição RPPS (14% total)</span>
+            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.contrib_sem)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">IR na Fonte (atual)</span>
+            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.irSal_sem)}</span>
+          </div>
+          <div class="efeito-row" style="background:rgba(15,39,68,0.04);padding:6px 8px;border-radius:6px;margin:2px 0;">
+            <span class="er-label">Líquido atual estimado</span>
+            <span class="er-val" style="font-size:15px;font-weight:700;">${fmtBRL(sc.liqSal_sem)}</span>
+          </div>
+          <div class="efeito-row" style="margin-top:4px;">
+            <span class="er-label">PÓS-MIGRAÇÃO — Nova contrib. RPPS (14% até teto)</span>
+            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.contrib_rpps_com)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">Contrib. RPC (${state.aliquota}% acima do teto)</span>
+            <span class="er-val" style="color:var(--teal)">−${fmtBRL(sc.contrib_rpc_com)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">IR na Fonte (pós-migração)</span>
+            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.irSal_com)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label" style="font-weight:700;">Diferença no líquido mensal</span>
+            <span class="er-val" style="color:${sc.efeitoLiq>=0?'var(--green)':'var(--red)'};font-size:16px;font-weight:700;">${sc.efeitoLiq>=0?'+':''}${fmtBRL(sc.efeitoLiq)}</span>
+          </div>
+        </div>
+        ${sc.efeitoLiq < 0 ? `<div class="warn-box" style="margin-top:12px;">⚠ A contribuição ao RPC reduz o líquido atual em <strong>${fmtBRL(Math.abs(sc.efeitoLiq))}/mês</strong>. Este valor vai para sua conta individual no RPC e retornará como benefício na aposentadoria.</div>` : `<div class="info-box" style="margin-top:12px;">✓ Por recolher 14% apenas até o teto do RGPS (em vez de sobre o salário total), o líquido do contracheque aumenta <strong>${fmtBRL(sc.efeitoLiq)}/mês</strong>, mesmo pagando o RPC.</div>`}
+      </div>
+    </div>` : ''}
+
+    <!-- COBERTURA DE RISCO -->
+    <div class="card">
+      <div class="card-body" style="padding:16px;">
+        <div class="section-title">Benefícios de risco (estimativa)</div>
+        <div class="risco-grid">
+          <div class="risco-card">
+            <div class="risco-title">⚰ Pensão por Morte</div>
+            <div class="risco-row"><span class="rl">Sem RPC (apenas RPPS)</span><span class="rv">${fmtBRL(sc.pensaoLiqSem)}/mês</span></div>
+            <div class="risco-row"><span class="rl">Com RPC (RPPS + CE-Prevcom)</span><span class="rv" style="color:var(--teal)">${fmtBRL(sc.pensaoLiqCom)}/mês</span></div>
+          </div>
+          <div class="risco-card">
+            <div class="risco-title">🏥 Invalidez</div>
+            <div class="risco-row"><span class="rl">Sem RPC (apenas RPPS)</span><span class="rv">${fmtBRL(sc.pensaoLiqSem)}/mês</span></div>
+            <div class="risco-row"><span class="rl">Com RPC (RPPS + CE-Prevcom)</span><span class="rv" style="color:var(--teal)">${fmtBRL(sc.pensaoLiqCom)}/mês</span></div>
+          </div>
+        </div>
+        <div class="warn-box" style="margin-top:10px;">
+          ⚠ Estimativa simplificada baseada no saldo acumulado. Consulte a CE-PREVCOM para detalhes sobre cobertura adicional de risco (PAR) e beneficiários livres no RPC.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      📋 <strong>Simulação ilustrativa.</strong> Valores projetados com crescimento salarial real de 1,0% a.a. · Taxa IR Regressivo após 10 anos: 10% · Isenção contribuição inativo RPPS: ${fmtBRL(RPPS_EXEMPTION)} · Teto RGPS: ${fmtBRL(RGPS)} · Versão 2026.01-1.<br>
+      Esta simulação não substitui assessoria previdenciária profissional. Consulte a CE-PREVCOM antes de efetivar qualquer decisão.
+    </div>
+
+    <div class="pdf-actions" style="text-align:center; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn-pdf" id="btnPDF" onclick="gerarPDF()">📄 Baixar PDF da Simulação</button>
+      <button class="btn-restart btn-print" onclick="window.print()">🖨️ Imprimir</button>
+      <button class="btn-restart" onclick="restart()">↺ Nova Simulação</button>
+    </div>
+  </div>`;
+}
+
+// ================================================================
+// ACTIONS
+// ================================================================
+function setSexo(v) { state.sexo = v; render(); }
+function setCat(v) { state.cat = v; render(); }
+function setTipo(v) { state.tipo = v; render(); }
+function setTributo(v) { state.tributo = v; render(); }
+function setScenario(v) { state.scenario = v; renderProgress(); document.getElementById('app').innerHTML = renderResults(); attachListeners(); }
+function goStep(i) { if (i <= state.step) { state.step = i; render(); } }
+function restart() { state.step = 0; state.scenario = 'base'; render(); }
+
+function readFormStep0() {
+  state.idade = document.getElementById('f_idade')?.value || state.idade;
+  state.tempoContrib = document.getElementById('f_tempo')?.value || state.tempoContrib;
+}
+function readFormStep1() {
+  state.salario = document.getElementById('f_salario')?.value || state.salario;
+  state.rppsEstimado = document.getElementById('f_rpps')?.value || state.rppsEstimado;
+  state.beneficioEspecial = document.getElementById('f_be')?.value || state.beneficioEspecial || '0';
+}
+function readFormStep2() {
+  const ai = document.getElementById('f_idadeAposen');
+  if (ai) state.idadeAposentadoria = ai.value;
+  const pr = document.getElementById('f_prazo');
+  if (pr) state.prazo = pr.value;
+  const sl = document.getElementById('f_saldo');
+  if (sl) state.saldoAtual = sl.value;
+  const po = document.getElementById('f_port');
+  if (po) state.portabilidade = po.value;
+}
+
+function validateStep(step) {
+  if (step === 0) {
+    const idade = parseFloat(state.idade);
+    if (!idade || idade < 18 || idade > 74) { alert('Informe sua idade atual (18–74 anos).'); return false; }
+    if (!state.tempoContrib) { alert('Informe o tempo de contribuição ao RPPS.'); return false; }
+    return true;
+  }
+  if (step === 1) {
+    if (!parseFloat(state.salario)) { alert('Informe sua remuneração atual.'); return false; }
+    if (!parseFloat(state.rppsEstimado)) { alert('Informe a estimativa de benefício RPPS.'); return false; }
+    return true;
+  }
+  return true;
+}
+
+function nextStep() {
+  if (state.step === 0) readFormStep0();
+  if (state.step === 1) readFormStep1();
+  if (!validateStep(state.step)) return;
+  state.step++;
+  render();
+  window.scrollTo(0, 0);
+}
+function prevStep() {
+  if (state.step === 2) readFormStep2();
+  if (state.step === 1) readFormStep1();
+  state.step--;
+  render();
+  window.scrollTo(0, 0);
+}
+function goResults() {
+  readFormStep2();
+  state.step = 3;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function attachListeners() {
+  const aliqEl = document.getElementById('f_aliq');
+  if (aliqEl) {
+    aliqEl.addEventListener('input', function() {
+      state.aliquota = parseFloat(this.value);
+      document.getElementById('app').innerHTML = renderStep2();
+      attachListeners();
+    });
+  }
+}
+
+// ================================================================
+// PDF GENERATION
+// ================================================================
+async function gerarPDF() {
+  const btn = document.getElementById('btnPDF');
+  const el  = document.getElementById('resultado-pdf');
+  if (!el) return;
+
+  // Hide interactive elements inside the results div
+  const tabs    = el.querySelector('.scenario-tabs');
+  const actions = el.querySelector('.pdf-actions');
+  if (tabs)    tabs.style.display    = 'none';
+  if (actions) actions.style.display = 'none';
+
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Gerando PDF…'; }
+
+  // Add a simple print header for the PDF
+  const pdfHeader = document.createElement('div');
+  pdfHeader.id = 'pdf-header-temp';
+  pdfHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px;border-bottom:2px solid #0d7377;margin-bottom:16px;';
+  pdfHeader.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#0d7377,#14a085);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:700;">CE</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#0f2744;">Simulador Previdenciário - COGERH</div>
+        <div style="font-size:10px;color:#6b7fa3;letter-spacing:1px;text-transform:uppercase;">RPPS · RPC · CE-Prevcom</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:#6b7fa3;text-align:right;">Gerado em ${new Date().toLocaleDateString('pt-BR')}</div>`;
+  el.insertBefore(pdfHeader, el.firstChild);
+
+  const opt = {
+    margin:     [8, 8, 8, 8],
+    filename:   'simulacao_prevcom_cogerh.pdf',
+    image:      { type: 'jpeg', quality: 0.97 },
+    html2canvas:{ scale: 2, useCORS: true, logging: false },
+    jsPDF:      { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  try {
+    await html2pdf().set(opt).from(el).save();
+  } catch(e) {
+    alert('Erro ao gerar PDF. Tente usar o botão Imprimir.');
+  }
+
+  // Restore
+  el.removeChild(pdfHeader);
+  if (tabs)    tabs.style.display    = '';
+  if (actions) actions.style.display = '';
+  if (btn) { btn.disabled = false; btn.textContent = '📄 Baixar PDF da Simulação'; }
+}
+
+// ================================================================
+// INIT
+// ================================================================
+render();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>
