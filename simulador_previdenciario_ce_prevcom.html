@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
 <style>
 :root {
   --navy: #0f2744;
@@ -467,20 +468,17 @@ const SCENARIOS = [
   {key:'base', label:'Base',      rate:0.04, color:'#3b82f6', bg:'#dbeafe', tabCls:'active-base'},
   {key:'bull', label:'Otimista',  rate:0.05, color:'#10b981', bg:'#d1fae5', tabCls:'active-bull'},
 ];
+// Convênio COGERH × CE-PREVCOM — empregados CLT/RGPS
 const TIPOS = [
-  {val:'1', title:'Migração de Regime', desc:'Servidor(a) ativo com RPPS irrestrito que deseja limitar o RPPS e ingressar automaticamente no RPC da CE-PREVCOM.'},
-  {val:'2', title:'Novo(a) Servidor(a)', desc:'Ingresso após 01/08/2021 — RPPS já limitado ao teto do RGPS. Analisa cobertura RPPS + RPC.'},
-  {val:'3', title:'Participante Facultativo', desc:'Servidor que mantém RPPS integral e quer contribuir voluntariamente ao RPC.'},
+  {val:'1', title:'Ingresso no RPC CE-PREVCOM', desc:'Empregado(a) COGERH que ainda não aderiu ao plano e deseja simular o benefício complementar sobre o INSS.'},
+  {val:'2', title:'Já Participante CE-PREVCOM', desc:'Empregado(a) que já contribui para o RPC e deseja projetar o saldo e o benefício na aposentadoria.'},
 ];
 const CATS = [
-  {val:'1', label:'Servidor(a) Geral'},
-  {val:'2', label:'Professor(a)'},
-  {val:'3', label:'Segurança Pública'},
+  {val:'1', label:'Empregado(a) COGERH'},
 ];
 function retireAge(cat, sex) {
-  if (cat==='3') return 55;
-  if (cat==='2') return sex==='M'?60:57;
-  return sex==='M'?65:62;
+  // Regra RGPS/INSS — EC 103/2019
+  return sex === 'M' ? 65 : 62;
 }
 
 let state = {
@@ -488,11 +486,28 @@ let state = {
   scenario: 'base',
   // Step 0
   idade: '', sexo: 'M', cat: '1', tipo: '1', tempoContrib: '',
-  // Step 1
-  salario: '', rppsEstimado: '', beneficioEspecial: '0',
+  // Step 1 — COGERH CLT/RGPS
+  salario: '', inssEstimado: '',
   // Step 2
   aliquota: 8.5, prazo: 25, tributo: 'R', portabilidade: '0', saldoAtual: '0', idadeAposentadoria: '',
 };
+
+// Tabela progressiva INSS 2025 (CLT)
+function inssContrib(salary) {
+  const s = Math.min(salary, 7786.02);
+  if (s <= 1518.00)  return s * 0.075;
+  if (s <= 2793.88)  return 1518.00*0.075 + (s-1518.00)*0.09;
+  if (s <= 4190.83)  return 1518.00*0.075 + (2793.88-1518.00)*0.09  + (s-2793.88)*0.12;
+  return               1518.00*0.075 + (2793.88-1518.00)*0.09  + (4190.83-2793.88)*0.12 + (s-4190.83)*0.14;
+}
+// Alíquota marginal IRPF aproximada para cálculo de economia fiscal
+function marginalIR(base) {
+  if (base <= 2824)    return 0;
+  if (base <= 3751.05) return 0.075;
+  if (base <= 5050.80) return 0.15;
+  if (base <= 6448.95) return 0.225;
+  return 0.275;
+}
 
 // ================================================================
 // RENDER ENGINE
@@ -523,7 +538,7 @@ function renderStep0() {
   return `<div class="card">
     <div class="card-header">
       <h2>Dados de Identificação</h2>
-      <p>Informe seu perfil pessoal e funcional para a simulação</p>
+      <p>Convênio COGERH × CE-PREVCOM · Empregado(a) CLT/RGPS</p>
     </div>
     <div class="card-body">
       <div class="form-grid">
@@ -533,25 +548,19 @@ function renderStep0() {
             <input type="number" id="f_idade" value="${state.idade}" placeholder="ex: 42" min="18" max="74">
           </div>
           <div class="field">
-            <label>Tempo de Contribuição RPPS <span class="required">*</span></label>
-            <input type="number" id="f_tempo" value="${state.tempoContrib}" placeholder="anos (incluir averbações)">
+            <label>Tempo de Contribuição ao INSS <span class="required">*</span></label>
+            <input type="number" id="f_tempo" value="${state.tempoContrib}" placeholder="anos (incluir vínculos anteriores)">
+            <span class="hint">Inclua todo o tempo de contribuição ao INSS (CNIS). Tempo mínimo para aposentadoria: 20 anos (homem) / 15 anos (mulher) — EC 103/2019.</span>
           </div>
         </div>
 
         <div class="field">
-          <label>Sexo (para efeito de aposentadoria)</label>
+          <label>Sexo (para efeito da aposentadoria pelo RGPS)</label>
           <div class="radio-group">
-            <div class="radio-option ${state.sexo==='M'?'selected':''}" onclick="setSexo('M')">Masculino</div>
-            <div class="radio-option ${state.sexo==='F'?'selected':''}" onclick="setSexo('F')">Feminino</div>
+            <div class="radio-option ${state.sexo==='M'?'selected':''}" onclick="setSexo('M')">Masculino (aposentadoria: 65 anos)</div>
+            <div class="radio-option ${state.sexo==='F'?'selected':''}" onclick="setSexo('F')">Feminino (aposentadoria: 62 anos)</div>
           </div>
-        </div>
-
-        <div class="field">
-          <label>Categoria Funcional</label>
-          <div class="radio-group">
-            ${CATS.map(c=>`<div class="radio-option ${state.cat===c.val?'selected':''}" onclick="setCat('${c.val}')">${c.label}</div>`).join('')}
-          </div>
-          <span class="hint">Idade mínima legal para aposentadoria: <strong>${ra} anos</strong></span>
+          <span class="hint">Idade mínima RGPS (EC 103/2019): <strong>${ra} anos</strong> · Aposentadoria compulsória: 70 anos (CLT)</span>
         </div>
 
         <div class="field">
@@ -566,6 +575,10 @@ function renderStep0() {
             </div>`).join('')}
           </div>
         </div>
+
+        <div class="info-box">
+          <strong>Convênio COGERH × CE-PREVCOM:</strong> empregados(as) da COGERH são vinculados ao <strong>RGPS (INSS)</strong>, sem RPPS. O plano CE-PREVCOM é a previdência complementar fechada (EFPC) patrocinada pela COGERH, nos termos da LC nº 109/2001. A COGERH contribui com <strong>8,5%</strong> sobre o excedente ao teto INSS, em paridade com o empregado (até 8,5%).
+        </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="nextStep()">Próximo →</button>
@@ -575,45 +588,34 @@ function renderStep0() {
 }
 
 function renderStep1() {
-  const ra = retireAge(state.cat, state.sexo);
-  const isTipo1 = state.tipo === '1';
   return `<div class="card">
     <div class="card-header">
       <h2>Dados Financeiros</h2>
-      <p>Remuneração atual e estimativa de benefício previdenciário</p>
+      <p>Remuneração atual e estimativa de benefício INSS na aposentadoria</p>
     </div>
     <div class="card-body">
       <div class="form-grid">
         <div class="field">
-          <label>Remuneração atual (base de contribuição ao RPPS) <span class="required">*</span></label>
+          <label>Remuneração atual (base de contribuição ao INSS) <span class="required">*</span></label>
           <div class="input-wrap">
             <span class="prefix">R$</span>
             <input type="number" class="currency" id="f_salario" value="${state.salario}" placeholder="0,00" min="0" step="100">
           </div>
-          <span class="hint">Soma das rubricas com incidência previdenciária</span>
+          <span class="hint">Soma das rubricas do contracheque com incidência previdenciária (INSS). Consulte o RH ou o holerite.</span>
         </div>
 
         <div class="field">
-          <label>Estimativa do benefício RPPS ${isTipo1?'SEM limitação (situação atual)':''} <span class="required">*</span></label>
+          <label>Estimativa do benefício INSS/RGPS na aposentadoria <span class="required">*</span></label>
           <div class="input-wrap">
             <span class="prefix">R$</span>
-            <input type="number" class="currency" id="f_rpps" value="${state.rppsEstimado}" placeholder="0,00" min="0" step="100">
+            <input type="number" class="currency" id="f_rpps" value="${state.inssEstimado}" placeholder="0,00" min="0" step="100">
           </div>
-          <span class="hint">${isTipo1?'Para ingresso até 2003: última remuneração. Após 2004: média da carreira (~65-75% do último salário). Consulte o RH.':'Valor máximo: '+fmtBRL(RGPS)+' (teto RGPS/INSS)'}</span>
+          <span class="hint">Valor máximo: ${fmtBRL(RGPS)} (teto INSS 2025). Baseado na média dos salários de contribuição. Consulte o CNIS ou o RH para estimativa personalizada.</span>
         </div>
 
-        ${isTipo1 ? `<div class="field">
-          <label>Benefício Especial (BE) estimado</label>
-          <div class="input-wrap">
-            <span class="prefix">R$</span>
-            <input type="number" class="currency" id="f_be" value="${state.beneficioEspecial}" placeholder="0,00" min="0" step="100">
-          </div>
-          <span class="hint">Benefício pago pelo Tesouro Estadual (diferencial entre RPPS pleno e limitado). Obter do RH/CEARAPREV.</span>
-        </div>` : '<div></div>'}
-
         <div class="info-box">
-          <strong>Teto do RGPS/INSS atual:</strong> ${fmtBRL(RGPS)}<br>
-          ${isTipo1?`Com a migração, seu RPPS ficará <strong>limitado a este teto</strong>. O Benefício Especial compensará a diferença parcialmente.`:`Seu RPPS já está limitado a este teto.`}
+          <strong>Convênio COGERH × CE-PREVCOM:</strong> como empregado(a) CLT vinculado ao RGPS (INSS), seu benefício previdenciário obrigatório está limitado ao teto de <strong>${fmtBRL(RGPS)}</strong>. O RPC da CE-PREVCOM complementa essa renda na aposentadoria, sem limite de acumulação.<br><br>
+          <strong>Base legal:</strong> Lei Complementar nº 109/2001 · Res. CGPC nº 06/2003 · Convênio COGERH/CE-PREVCOM.
         </div>
       </div>
       <div class="btn-row">
@@ -717,70 +719,86 @@ function renderStep2() {
 }
 
 function computeAll() {
-  const salary = parseFloat(state.salario)||0;
-  const rppsNoRPC = parseFloat(state.rppsEstimado)||0;
-  const empRate = state.aliquota / 100;
+  const salary      = parseFloat(state.salario)||0;
+  const inssEstim   = Math.min(parseFloat(state.inssEstimado)||0, RGPS); // COGERH CLT: teto RGPS
+  const empRate     = state.aliquota / 100;
   const portability = parseFloat(state.portabilidade)||0;
-  const existing = parseFloat(state.saldoAtual)||0;
-  const prazo = Math.min(30, Math.max(5, parseFloat(state.prazo)||25));
-  const be = parseFloat(state.beneficioEspecial)||0;
-  const regimeTrib = state.tributo;
-  const ra = retireAge(state.cat, state.sexo);
-  const idadeAtual = parseFloat(state.idade)||0;
-  const idadeAposentadoria = parseFloat(state.idadeAposentadoria)||ra;
-  const yearsToRetire = Math.max(0, idadeAposentadoria - idadeAtual);
-  const rppsLimited = Math.min(rppsNoRPC, RGPS);
+  const existing    = parseFloat(state.saldoAtual)||0;
+  const prazo       = Math.min(30, Math.max(5, parseFloat(state.prazo)||25));
+  const regimeTrib  = state.tributo;
+  const ra          = retireAge(state.cat, state.sexo);
+  const idadeAtual  = parseFloat(state.idade)||0;
+  const idadeAposen = parseFloat(state.idadeAposentadoria)||ra;
+  const yearsToRetire = Math.max(0, idadeAposen - idadeAtual);
+
+  // ── Contracheque ATIVO ─────────────────────────────────────────
+  // COGERH CLT: INSS progressivo sobre salário (até teto INSS) + RPC sobre excedente ao RGPS
+  const inssAtivo      = inssContrib(salary);
+  const rpcContribEmp  = Math.max(0, salary - RGPS) * empRate;
+  const rpcContribPat  = Math.max(0, salary - RGPS) * EMPLOYER_RATE;
+  const rpcContribTotal= rpcContribEmp + rpcContribPat;
+
+  // IR mensal SEM RPC (base = salário - INSS)
+  const baseIR_sem = Math.max(0, salary - inssAtivo);
+  const irSal_sem  = irProg(baseIR_sem);
+  const liqSal_sem = salary - inssAtivo - irSal_sem;
+
+  // IR mensal COM RPC — contribuição do empregado deduz a base IR (PGBL/EFPC, Lei 9.250)
+  const baseIR_com = Math.max(0, salary - inssAtivo - rpcContribEmp);
+  const irSal_com  = irProg(baseIR_com);
+  const liqSal_com = salary - inssAtivo - rpcContribEmp - irSal_com;
+  const efeitoLiqMensal = liqSal_com - liqSal_sem; // geralmente negativo (custo mensal líquido do RPC)
+
+  // ── Dedução IRPF anual — até 12% da renda bruta (LC 109/2001 + Lei 9.250) ──────
+  const rendaBrutaAnual   = salary * 12;
+  const contrib12pct      = rendaBrutaAnual * 0.12;
+  const rpcAnualEmp       = rpcContribEmp * 12;
+  const deducaoEfetiva    = Math.min(rpcAnualEmp, contrib12pct);
+  const baseIR_anual_sem  = Math.max(0, baseIR_sem) * 12;
+  const baseIR_anual_com  = Math.max(0, baseIR_sem * 12 - deducaoEfetiva);
+  const irAnual_sem       = irProg(baseIR_anual_sem / 12) * 12;
+  const irAnual_com       = irProg(baseIR_anual_com / 12) * 12;
+  const economiaIRanual   = Math.max(0, irAnual_sem - irAnual_com);
+  const economiaMensal    = economiaIRanual / 12;
+  const custoLiquidoMensal= rpcContribEmp - economiaMensal; // custo real após benefício fiscal
 
   return SCENARIOS.map(sc => {
-    const rate = sc.rate;
-    const saldo = accumulate(salary, yearsToRetire, empRate, rate, portability, existing);
+    const rate     = sc.rate;
+    const saldo    = accumulate(salary, yearsToRetire, empRate, rate, portability, existing);
     const rpcGross = rpcBenefit(saldo, prazo, POST_RETIRE_RATE);
 
-    // SEM RPC
-    const rppsC_sem = Math.max(0, rppsNoRPC - RPPS_EXEMPTION) * RPPS_CONTRIB_BENEFIT;
-    const irSem = Math.max(0, irProg(rppsNoRPC - rppsC_sem));
-    const liqSem = rppsNoRPC - rppsC_sem - irSem;
+    // ── APOSENTADORIA SEM RPC ─────────────────────────────────────
+    // COGERH CLT: RGPS/INSS, sem contribuição de inativo (não existe para CLT)
+    const irSem  = irProg(inssEstim);  // IR progressivo sobre benefício INSS
+    const liqSem = inssEstim - irSem;
 
-    // COM RPC
-    const rppsC_com = Math.max(0, rppsLimited - RPPS_EXEMPTION) * RPPS_CONTRIB_BENEFIT;
-    const irRPPScom = Math.max(0, irProg(rppsLimited + be - rppsC_com));
-    const rppsLiqCom = rppsLimited + be - rppsC_com - irRPPScom;
-    const irRPC = regimeTrib === 'R'
+    // ── APOSENTADORIA COM RPC ─────────────────────────────────────
+    const irINSS = irProg(inssEstim);
+    const inssLiq = inssEstim - irINSS;
+    const irRPC  = regimeTrib === 'R'
       ? Math.max(0, irRegr(rpcGross, yearsToRetire))
       : Math.max(0, irProg(rpcGross));
     const rpcLiq = rpcGross - irRPC;
-    const liqCom = rppsLiqCom + rpcLiq;
-    const variacao = liqCom - liqSem;
+    const liqCom = inssLiq + rpcLiq;
+
+    const variacao    = liqCom - liqSem;
     const variacaoPct = liqSem > 0 ? variacao / liqSem : 0;
 
-    // EFEITO NO LIQUIDO ATUAL (salário)
-    const contrib_sem = salary * RPPS_CONTRIB_BENEFIT;
-    const irSal_sem = Math.max(0, irProg(salary - contrib_sem));
-    const liqSal_sem = salary - contrib_sem - irSal_sem;
-    const contrib_rpps_com = Math.min(salary, RGPS) * RPPS_CONTRIB_BENEFIT;
-    const contrib_rpc_com = Math.max(0, salary - RGPS) * empRate;
-    const contrib_total_com = contrib_rpps_com + contrib_rpc_com;
-    const baseIR_com = salary - contrib_rpps_com - contrib_rpc_com;
-    const irSal_com = Math.max(0, irProg(baseIR_com));
-    const liqSal_com = salary - contrib_total_com - irSal_com;
-    const efeitoLiq = liqSal_com - liqSal_sem;
+    // ── BENEFÍCIOS DE RISCO (simplificado) ───────────────────────
+    const irPensaoSem  = irProg(inssEstim);
+    const pensaoLiqSem = inssEstim - irPensaoSem;
+    const irPensaoRPC  = regimeTrib === 'R'
+      ? Math.max(0, irRegr(rpcGross, yearsToRetire))
+      : Math.max(0, irProg(rpcGross));
+    const pensaoLiqCom = (inssEstim - irProg(inssEstim)) + rpcGross - irPensaoRPC;
 
-    // PENSÃO POR MORTE (simplificado)
-    const pensaoRPPS = rppsNoRPC;
-    const pensaoRPPS_liq_sem = Math.max(0, pensaoRPPS - RPPS_EXEMPTION) * RPPS_CONTRIB_BENEFIT;
-    const irPensaoSem = Math.max(0, irProg(pensaoRPPS - pensaoRPPS_liq_sem));
-    const pensaoLiqSem = pensaoRPPS - pensaoRPPS_liq_sem - irPensaoSem;
-
-    const pensaoRPPS_com = rppsLimited;
-    const rpcPensao = rpcBenefit(saldo, prazo, POST_RETIRE_RATE);
-    const irPensaoRPC = regimeTrib === 'R' ? Math.max(0, irRegr(rpcPensao, yearsToRetire)) : Math.max(0, irProg(rpcPensao));
-    const pensaoLiqCom = Math.max(0, pensaoRPPS_com - Math.max(0, pensaoRPPS_com - RPPS_EXEMPTION)*RPPS_CONTRIB_BENEFIT - Math.max(0, irProg(pensaoRPPS_com))) + rpcPensao - irPensaoRPC;
-
-    return { ...sc, rate, saldo, rpcGross, rpcLiq, rppsNoRPC, rppsLimited, be,
-      liqSem, liqCom, variacao, variacaoPct,
-      rppsC_sem, irSem, rppsC_com, irRPPScom, irRPC,
-      liqSal_sem, liqSal_com, efeitoLiq,
-      contrib_sem, contrib_rpps_com, contrib_rpc_com, irSal_sem, irSal_com,
+    return { ...sc, rate, saldo, rpcGross, rpcLiq,
+      inssEstim, liqSem, liqCom, variacao, variacaoPct,
+      irSem, irINSS, irRPC,
+      inssAtivo, rpcContribEmp, rpcContribPat, rpcContribTotal,
+      irSal_sem, irSal_com, liqSal_sem, liqSal_com, efeitoLiqMensal,
+      deducaoEfetiva, rpcAnualEmp, contrib12pct, economiaIRanual,
+      economiaMensal, custoLiquidoMensal, rendaBrutaAnual,
       salary, yearsToRetire, prazo,
       pensaoLiqSem, pensaoLiqCom,
     };
@@ -789,15 +807,14 @@ function computeAll() {
 
 function renderResults() {
   const data = computeAll();
-  const sc = data.find(d => d.key === state.scenario) || data[1];
+  const sc   = data.find(d => d.key === state.scenario) || data[1];
   const isPos = sc.variacao >= 0;
-  const isMig = state.tipo === '1';
 
-  const maxLiq = Math.max(...data.map(d => Math.max(d.liqSem, d.liqCom)), 1);
+  const maxLiq  = Math.max(...data.map(d => Math.max(d.liqSem, d.liqCom)), 1);
   const barScale = v => Math.max(5, (v / maxLiq * 100)).toFixed(1);
-  const barColor = (v, max) => v >= max - 10 ? 'var(--teal)' : 'var(--navy-mid)';
 
   return `<div id="resultado-pdf" style="display:flex;flex-direction:column;gap:16px;">
+
     <!-- SCENARIO TABS -->
     <div>
       <div class="scenario-tabs">
@@ -816,12 +833,12 @@ function renderResults() {
         <div class="vb-pct">${isPos?'+':'−'}${fmtPct(Math.abs(sc.variacaoPct))}</div>
       </div>
 
-      <!-- COMPARISON GRID -->
+      <!-- COMPARISON GRID — COGERH CLT/RGPS -->
       <div class="result-grid">
         <div class="result-card sem">
-          <div class="result-label">🔴 Sem RPC (RPPS puro)</div>
-          <div class="result-row"><span>Benefício RPPS bruto</span><span class="val">${fmtBRL(sc.rppsNoRPC)}</span></div>
-          <div class="result-row"><span>(−) Contrib. inativo RPPS</span><span class="val red">−${fmtBRL(sc.rppsC_sem)}</span></div>
+          <div class="result-label">🔴 Sem RPC (só INSS/RGPS)</div>
+          <div class="result-row"><span>Benefício INSS bruto</span><span class="val">${fmtBRL(sc.inssEstim)}</span></div>
+          <div class="result-row"><span style="font-size:11px;color:var(--green)">✓ Sem contrib. de inativo (CLT)</span><span class="val" style="color:var(--green)">R$&nbsp;0,00</span></div>
           <div class="result-row"><span>(−) IR Progressivo</span><span class="val red">−${fmtBRL(sc.irSem)}</span></div>
           <div class="result-total sem">
             <span class="label">Renda Líquida</span>
@@ -829,11 +846,11 @@ function renderResults() {
           </div>
         </div>
         <div class="result-card com">
-          <div class="result-label">🟢 Com RPC (RPPS + CE-Prevcom)</div>
-          <div class="result-row"><span>RPPS limitado + BE</span><span class="val">${fmtBRL(sc.rppsLimited + sc.be)}</span></div>
+          <div class="result-label">🟢 Com RPC (INSS + CE-Prevcom)</div>
+          <div class="result-row"><span>Benefício INSS bruto</span><span class="val">${fmtBRL(sc.inssEstim)}</span></div>
           <div class="result-row"><span>Benefício RPC bruto</span><span class="val gold">${fmtBRL(sc.rpcGross)}</span></div>
-          <div class="result-row"><span>(−) Contrib. inativo RPPS</span><span class="val red">−${fmtBRL(sc.rppsC_com)}</span></div>
-          <div class="result-row"><span>(−) IR (RPPS + RPC)</span><span class="val red">−${fmtBRL(sc.irRPPScom + sc.irRPC)}</span></div>
+          <div class="result-row"><span>(−) IR s/ INSS</span><span class="val red">−${fmtBRL(sc.irINSS)}</span></div>
+          <div class="result-row"><span>(−) IR s/ RPC (${state.tributo==='R'?'regressivo':'progressivo'})</span><span class="val red">−${fmtBRL(sc.irRPC)}</span></div>
           <div class="result-total com">
             <span class="label">Renda Líquida</span>
             <span class="amount">${fmtBRL(sc.liqCom)}</span>
@@ -849,24 +866,15 @@ function renderResults() {
             ${data.map(d => {
               const semW = barScale(d.liqSem);
               const comW = barScale(d.liqCom);
-              return `
-              <div>
+              return `<div>
                 <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;">${d.label} (${(d.rate*100).toFixed(0)}% a.a. real)</div>
                 <div class="bar-row">
-                  <div class="bar-row-label">Sem RPC</div>
-                  <div class="bar-track">
-                    <div class="bar-fill" style="width:${semW}%;background:var(--muted);">
-                      <span>${fmtBRL(d.liqSem)}</span>
-                    </div>
-                  </div>
+                  <div class="bar-row-label">Só INSS</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:${semW}%;background:var(--muted);"><span>${fmtBRL(d.liqSem)}</span></div></div>
                 </div>
                 <div class="bar-row">
-                  <div class="bar-row-label">Com RPC</div>
-                  <div class="bar-track">
-                    <div class="bar-fill" style="width:${comW}%;background:var(--teal);">
-                      <span>${fmtBRL(d.liqCom)}</span>
-                    </div>
-                  </div>
+                  <div class="bar-row-label">INSS + RPC</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:${comW}%;background:var(--teal);"><span>${fmtBRL(d.liqCom)}</span></div></div>
                 </div>
               </div>`;
             }).join('')}
@@ -885,82 +893,123 @@ function renderResults() {
             <div class="ac-value">${fmtBRL(d.saldo)}</div>
           </div>`).join('')}
         </div>
-        <div class="hint" style="font-size:11px;color:var(--muted);">
-          Acumulação de ${sc.yearsToRetire.toFixed(1)} anos | Prazo de recebimento: ${sc.prazo} anos | Taxa pós-aposentadoria: 1,0% a.a. real
+        <div class="hint" style="font-size:11px;color:var(--muted);margin-top:8px;">
+          Acumulação de ${sc.yearsToRetire.toFixed(1)} anos | Contrib. total (empregado ${state.aliquota}% + COGERH 8,5%) | Prazo de recebimento: ${sc.prazo} anos | Taxa pós: 1,0% a.a. real
         </div>
       </div>
     </div>
 
-    ${isMig ? `<!-- EFEITO NO CONTRACHEQUE -->
+    <!-- EFEITO NO CONTRACHEQUE (todos os tipos COGERH) -->
     <div class="card">
       <div class="card-body" style="padding:16px;">
-        <div class="section-title">Efeito imediato no líquido da remuneração (mês atual)</div>
+        <div class="section-title">Efeito no contracheque ao aderir ao RPC</div>
         <div class="efeito-box">
           <div class="efeito-row">
-            <span class="er-label">Remuneração bruta atual</span>
+            <span class="er-label">Remuneração bruta</span>
             <span class="er-val">${fmtBRL(sc.salary)}</span>
           </div>
           <div class="efeito-row">
-            <span class="er-label">Situação ATUAL — Contribuição RPPS (14% total)</span>
-            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.contrib_sem)}</span>
+            <span class="er-label">(−) INSS ativo (tabela progressiva)</span>
+            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.inssAtivo)}</span>
           </div>
           <div class="efeito-row">
-            <span class="er-label">IR na Fonte (atual)</span>
+            <span class="er-label">IR na Fonte — sem RPC</span>
             <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.irSal_sem)}</span>
           </div>
-          <div class="efeito-row" style="background:rgba(15,39,68,0.04);padding:6px 8px;border-radius:6px;margin:2px 0;">
-            <span class="er-label">Líquido atual estimado</span>
+          <div class="efeito-row" style="background:rgba(15,39,68,0.04);padding:6px 8px;border-radius:6px;">
+            <span class="er-label">Líquido atual (sem RPC)</span>
             <span class="er-val" style="font-size:15px;font-weight:700;">${fmtBRL(sc.liqSal_sem)}</span>
           </div>
-          <div class="efeito-row" style="margin-top:4px;">
-            <span class="er-label">PÓS-MIGRAÇÃO — Nova contrib. RPPS (14% até teto)</span>
-            <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.contrib_rpps_com)}</span>
+          <div class="efeito-row" style="margin-top:6px;">
+            <span class="er-label">(−) Contrib. RPC empregado (${state.aliquota}% s/ excedente ao teto INSS)</span>
+            <span class="er-val" style="color:var(--teal)">−${fmtBRL(sc.rpcContribEmp)}</span>
           </div>
           <div class="efeito-row">
-            <span class="er-label">Contrib. RPC (${state.aliquota}% acima do teto)</span>
-            <span class="er-val" style="color:var(--teal)">−${fmtBRL(sc.contrib_rpc_com)}</span>
-          </div>
-          <div class="efeito-row">
-            <span class="er-label">IR na Fonte (pós-migração)</span>
+            <span class="er-label">IR na Fonte — com RPC (base reduzida pela contrib.)</span>
             <span class="er-val" style="color:var(--red)">−${fmtBRL(sc.irSal_com)}</span>
           </div>
           <div class="efeito-row">
-            <span class="er-label" style="font-weight:700;">Diferença no líquido mensal</span>
-            <span class="er-val" style="color:${sc.efeitoLiq>=0?'var(--green)':'var(--red)'};font-size:16px;font-weight:700;">${sc.efeitoLiq>=0?'+':''}${fmtBRL(sc.efeitoLiq)}</span>
+            <span class="er-label" style="font-weight:700;">Diferença mensal líquida ao aderir ao RPC</span>
+            <span class="er-val" style="color:${sc.efeitoLiqMensal>=0?'var(--green)':'var(--red)'};font-size:16px;font-weight:700;">${sc.efeitoLiqMensal>=0?'+':''}${fmtBRL(sc.efeitoLiqMensal)}</span>
           </div>
         </div>
-        ${sc.efeitoLiq < 0 ? `<div class="warn-box" style="margin-top:12px;">⚠ A contribuição ao RPC reduz o líquido atual em <strong>${fmtBRL(Math.abs(sc.efeitoLiq))}/mês</strong>. Este valor vai para sua conta individual no RPC e retornará como benefício na aposentadoria.</div>` : `<div class="info-box" style="margin-top:12px;">✓ Por recolher 14% apenas até o teto do RGPS (em vez de sobre o salário total), o líquido do contracheque aumenta <strong>${fmtBRL(sc.efeitoLiq)}/mês</strong>, mesmo pagando o RPC.</div>`}
+        <div class="info-box" style="margin-top:12px;">
+          A contribuição ao RPC (${fmtBRL(sc.rpcContribEmp)}/mês) é dedutível da base de IR na fonte (LC 109/2001), reduzindo o IR em <strong>${fmtBRL(sc.irSal_sem - sc.irSal_com)}/mês</strong>. O custo real mensal do RPC é de <strong>${fmtBRL(Math.abs(sc.efeitoLiqMensal))}/mês</strong>, que vai para sua conta individual e retorna como benefício na aposentadoria.
+        </div>
       </div>
-    </div>` : ''}
+    </div>
+
+    <!-- DEDUÇÃO IRPF ANUAL — 12% DA RENDA BRUTA -->
+    <div class="card">
+      <div class="card-body" style="padding:16px;">
+        <div class="section-title">Benefício Fiscal — Dedução IRPF Anual (até 12%)</div>
+        <div class="info-box" style="margin-bottom:14px;">
+          Contribuições a planos de previdência complementar fechada (EFPC) são <strong>dedutíveis na Declaração Anual do IRPF até o limite de 12% da renda bruta tributável</strong> (art. 11 da Lei nº 9.250/1995 c/c LC nº 109/2001). Este benefício reduz o imposto a pagar ou aumenta a restituição.
+        </div>
+        <div class="efeito-box">
+          <div class="efeito-row">
+            <span class="er-label">Renda bruta tributável anual</span>
+            <span class="er-val">${fmtBRL(sc.rendaBrutaAnual)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">Limite dedutível (12% da renda bruta anual)</span>
+            <span class="er-val" style="color:var(--navy);font-weight:700;">${fmtBRL(sc.contrib12pct)}</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">Contribuição anual do empregado ao RPC</span>
+            <span class="er-val" style="color:var(--teal)">${fmtBRL(sc.rpcAnualEmp)}</span>
+          </div>
+          <div class="efeito-row" style="background:rgba(13,115,119,0.06);padding:6px 8px;border-radius:6px;">
+            <span class="er-label">Dedução efetiva aplicável (menor valor)</span>
+            <span class="er-val" style="font-weight:700;color:var(--teal)">${fmtBRL(sc.deducaoEfetiva)}</span>
+          </div>
+          <div class="efeito-row" style="background:rgba(26,122,74,0.08);padding:6px 8px;border-radius:6px;margin-top:4px;">
+            <span class="er-label" style="font-weight:700;">Economia de IR no ajuste anual</span>
+            <span class="er-val" style="color:var(--green);font-size:16px;font-weight:700;">${fmtBRL(sc.economiaIRanual)}/ano</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label">Equivalente mensal do benefício fiscal</span>
+            <span class="er-val" style="color:var(--green);font-weight:700;">+ ${fmtBRL(sc.economiaMensal)}/mês</span>
+          </div>
+          <div class="efeito-row">
+            <span class="er-label" style="font-weight:700;">Custo líquido real do RPC (após IR)</span>
+            <span class="er-val" style="color:${sc.custoLiquidoMensal<=0?'var(--green)':'var(--red)'};font-size:15px;font-weight:700;">${fmtBRL(Math.abs(sc.custoLiquidoMensal))}/mês ${sc.custoLiquidoMensal<=0?'(ganho líquido)':''}</span>
+          </div>
+        </div>
+        <div class="warn-box" style="margin-top:12px;">
+          ⚠ A dedução de 12% aplica-se exclusivamente às contribuições do <strong>participante</strong> (não inclui a parte da COGERH). Valores sujeitos à comprovação na DIRPF. Consulte seu contador ou a CE-PREVCOM.
+        </div>
+      </div>
+    </div>
 
     <!-- COBERTURA DE RISCO -->
     <div class="card">
       <div class="card-body" style="padding:16px;">
-        <div class="section-title">Benefícios de risco (estimativa)</div>
+        <div class="section-title">Benefícios de risco — estimativa (INSS + CE-PREVCOM)</div>
         <div class="risco-grid">
           <div class="risco-card">
             <div class="risco-title">⚰ Pensão por Morte</div>
-            <div class="risco-row"><span class="rl">Sem RPC (apenas RPPS)</span><span class="rv">${fmtBRL(sc.pensaoLiqSem)}/mês</span></div>
-            <div class="risco-row"><span class="rl">Com RPC (RPPS + CE-Prevcom)</span><span class="rv" style="color:var(--teal)">${fmtBRL(sc.pensaoLiqCom)}/mês</span></div>
+            <div class="risco-row"><span class="rl">Sem RPC (apenas INSS)</span><span class="rv">${fmtBRL(sc.pensaoLiqSem)}/mês</span></div>
+            <div class="risco-row"><span class="rl">Com RPC (INSS + CE-Prevcom)</span><span class="rv" style="color:var(--teal)">${fmtBRL(sc.pensaoLiqCom)}/mês</span></div>
           </div>
           <div class="risco-card">
-            <div class="risco-title">🏥 Invalidez</div>
-            <div class="risco-row"><span class="rl">Sem RPC (apenas RPPS)</span><span class="rv">${fmtBRL(sc.pensaoLiqSem)}/mês</span></div>
-            <div class="risco-row"><span class="rl">Com RPC (RPPS + CE-Prevcom)</span><span class="rv" style="color:var(--teal)">${fmtBRL(sc.pensaoLiqCom)}/mês</span></div>
+            <div class="risco-title">🏥 Aposentadoria por Invalidez</div>
+            <div class="risco-row"><span class="rl">Sem RPC (apenas INSS)</span><span class="rv">${fmtBRL(sc.pensaoLiqSem)}/mês</span></div>
+            <div class="risco-row"><span class="rl">Com RPC (INSS + CE-Prevcom)</span><span class="rv" style="color:var(--teal)">${fmtBRL(sc.pensaoLiqCom)}/mês</span></div>
           </div>
         </div>
         <div class="warn-box" style="margin-top:10px;">
-          ⚠ Estimativa simplificada baseada no saldo acumulado. Consulte a CE-PREVCOM para detalhes sobre cobertura adicional de risco (PAR) e beneficiários livres no RPC.
+          ⚠ Estimativa simplificada. O RPC CE-PREVCOM pode oferecer cobertura adicional de risco via PAR. Consulte a CE-PREVCOM para os valores exatos do seu plano.
         </div>
       </div>
     </div>
 
     <div class="footer-note">
-      📋 <strong>Simulação ilustrativa.</strong> Valores projetados com crescimento salarial real de 1,0% a.a. · Taxa IR Regressivo após 10 anos: 10% · Isenção contribuição inativo RPPS: ${fmtBRL(RPPS_EXEMPTION)} · Teto RGPS: ${fmtBRL(RGPS)} · Versão 2026.01-1.<br>
-      Esta simulação não substitui assessoria previdenciária profissional. Consulte a CE-PREVCOM antes de efetivar qualquer decisão.
+      📋 <strong>Simulação ilustrativa — Convênio COGERH × CE-PREVCOM.</strong> Empregados CLT/RGPS. Crescimento salarial real projetado: 1,0% a.a. · IR Regressivo após 10 anos: 10% · Teto INSS 2025: ${fmtBRL(RGPS)} · Contrib. patrocinador (COGERH): 8,5% · LC nº 109/2001 · Versão 2026.01-1.<br>
+      Esta simulação não substitui assessoria previdenciária profissional. Consulte a CE-PREVCOM antes de tomar qualquer decisão.
     </div>
 
-    <div class="pdf-actions" style="text-align:center; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+    <div class="pdf-actions" style="text-align:center; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; padding-top:8px;">
       <button class="btn-pdf" id="btnPDF" onclick="gerarPDF()">📄 Baixar PDF da Simulação</button>
       <button class="btn-restart btn-print" onclick="window.print()">🖨️ Imprimir</button>
       <button class="btn-restart" onclick="restart()">↺ Nova Simulação</button>
@@ -984,9 +1033,8 @@ function readFormStep0() {
   state.tempoContrib = document.getElementById('f_tempo')?.value || state.tempoContrib;
 }
 function readFormStep1() {
-  state.salario = document.getElementById('f_salario')?.value || state.salario;
-  state.rppsEstimado = document.getElementById('f_rpps')?.value || state.rppsEstimado;
-  state.beneficioEspecial = document.getElementById('f_be')?.value || state.beneficioEspecial || '0';
+  state.salario       = document.getElementById('f_salario')?.value || state.salario;
+  state.inssEstimado  = document.getElementById('f_rpps')?.value   || state.inssEstimado;
 }
 function readFormStep2() {
   const ai = document.getElementById('f_idadeAposen');
@@ -1003,12 +1051,12 @@ function validateStep(step) {
   if (step === 0) {
     const idade = parseFloat(state.idade);
     if (!idade || idade < 18 || idade > 74) { alert('Informe sua idade atual (18–74 anos).'); return false; }
-    if (!state.tempoContrib) { alert('Informe o tempo de contribuição ao RPPS.'); return false; }
+    if (!state.tempoContrib) { alert('Informe o tempo de contribuição ao INSS.'); return false; }
     return true;
   }
   if (step === 1) {
     if (!parseFloat(state.salario)) { alert('Informe sua remuneração atual.'); return false; }
-    if (!parseFloat(state.rppsEstimado)) { alert('Informe a estimativa de benefício RPPS.'); return false; }
+    if (!parseFloat(state.inssEstimado)) { alert('Informe a estimativa de benefício INSS na aposentadoria.'); return false; }
     return true;
   }
   return true;
@@ -1104,6 +1152,5 @@ async function gerarPDF() {
 // ================================================================
 render();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
