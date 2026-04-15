@@ -504,6 +504,51 @@ input[type=range]::-webkit-slider-thumb {
   .acum-wrap { grid-template-columns: 1fr; }
   .risco-grid { grid-template-columns: 1fr; }
   .progress-step .step-label { display: none; }
+
+  /* HEADER RESPONSIVO */
+  .header {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .header-logo {
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .logo-badge {
+    width: 34px; height: 34px;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .logo-text .main {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .logo-text .sub {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+  /* Botão + logo ficam na segunda linha, centralizados */
+  .header > div:last-child {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+  .header-logo-right img {
+    height: 36px;
+  }
+  /* Botão "Utilizando o Sistema" menor */
+  .header a[href="manual.html"] {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    white-space: nowrap;
+  }
 }
 
 @media print {
